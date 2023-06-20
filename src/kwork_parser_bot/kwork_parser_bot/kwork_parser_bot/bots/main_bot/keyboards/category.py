@@ -5,19 +5,33 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from kwork.types import Category
 from kwork.types.category import Subcategory
 
-from kwork_parser_bot.bots.main_bot.callbacks.order_exchange import CategoryCallback
+from kwork_parser_bot.bots.main_bot.callbacks.base import CategoryCallback
 
 
-def category_keyboard_builder(categories: list[Category | Subcategory], selected_category_id: Optional[int] = None):
+def category_keyboard_builder(
+    categories: list[Category | Subcategory],
+    subcategory_id: Optional[int] = None,
+    *,
+    callback_name: Optional[str] = "category",
+):
     builder = InlineKeyboardBuilder()
-    if selected_category_id:
-        selected_category: Category = list(filter(lambda x: x.id == selected_category_id, categories)).pop()
-        categories = selected_category.subcategories
+    if subcategory_id:
+        selected_category: list[Category] = list(
+            filter(lambda x: x.id == subcategory_id, categories)
+        )
+        if selected_category:
+            selected_category: Category | None = selected_category.pop()
+            categories = selected_category.subcategories
+        else:
+            return None
     for item in categories:
         builder.add(
             InlineKeyboardButton(
                 text=item.name,
-                callback_data=CategoryCallback(category_id=item.id, selected_category_id=selected_category_id).pack(),
+                callback_data=CategoryCallback(
+                    name=callback_name,
+                    category_id=item.id,
+                ).pack(),
             )
         )
     return builder

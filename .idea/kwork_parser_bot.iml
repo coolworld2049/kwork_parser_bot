@@ -3,6 +3,7 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/kwork_parser_bot/kwork_parser_bot" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/aiogram_template" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
     <orderEntry type="inheritedJdk" />

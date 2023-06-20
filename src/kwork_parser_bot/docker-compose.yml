@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   kwork_parser_bot:
-    image: coolworldocker/${PROJECT_NAME?}
+    image: coolworldocker/kwork_parser_bot
     build: .
     pull_policy: always
     env_file:

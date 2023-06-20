@@ -142,3 +142,4 @@ cython_debug/
 !/deployment/.volumes/
 !/src/kwork_parser_bot/kwork_parser_bot/kwork_parser_bot/.logs/
 !/.env
+!/src/kwork_parser_bot/kwork_parser_bot/kwork_parser_bot/.logs/

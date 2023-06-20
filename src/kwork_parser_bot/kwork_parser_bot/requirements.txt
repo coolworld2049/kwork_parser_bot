@@ -1,4 +1,5 @@
 aiogram==3.0.0b7
+redis
 python-dotenv
 pydantic
 black
@@ -6,3 +7,7 @@ loguru
 jinja2
 stringcase
 kwork
+sqlalchemy
+aiosqlite
+sqlalchemy-mixins
+pandas

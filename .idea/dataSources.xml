@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="kwork_parser_bot.sqlite" uuid="7f0bdeb8-9736-4e66-8df2-ee0bd8cf7dd7">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:C:\Users\coolw\PycharmProjects\kwork_parser_bot\src\kwork_parser_bot\kwork_parser_bot\kwork_parser_bot\db\kwork_parser_bot.sqlite</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+  </component>
+</project>

@@ -22,7 +22,16 @@ class BotSettings(BaseAppSettings):
     ]
 
 
-class Settings(BotSettings):
+class RedisSettings(BaseAppSettings):
+    USE_REDIS: Optional[bool] = True
+    REDIS_MASTER_HOST: str
+    REDIS_MASTER_PORT_NUMBER: int
+    REDIS_MASTER_PASSWORD: str
+    REDIS_PASSWORD: str
+    REDIS_DATABASE: Optional[int] = 5
+
+
+class Settings(BotSettings, RedisSettings):
     PROJECT_NAME: Optional[str] = pathlib.Path(__file__).parent
     STAGE: str
     KWORK_LOGIN: Optional[str]

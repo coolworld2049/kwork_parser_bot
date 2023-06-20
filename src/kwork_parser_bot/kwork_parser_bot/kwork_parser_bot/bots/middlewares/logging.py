@@ -14,7 +14,7 @@ class LoggingMiddleware(BaseMiddleware):
         data: Dict[str, Any],
     ) -> Any:
         result = await handler(event, data)
-        pprint(event, compact=True, indent=4)
-        pprint(data, compact=True, indent=4)
-        pprint(result, compact=True, indent=4)
+        pprint(event, compact=True)
+        pprint(data, compact=True)
+        print(f"result:{result}\n\n")
         return result

@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+
+  kwork_parser_bot:
+    extends:
+      service: kwork_parser_bot
+      file: ../src/kwork_parser_bot/docker-compose.yml
+    environment:
+      - STAGE=prod
+    volumes:
+      - ./.volumes/kwork_parser_bot/logs:/var/logs/kwork_parser_bot
+    restart: always
+
+  redis:
+    image: docker.io/bitnami/redis:latest
+    ports:
+      - '6379:6379'
+    env_file:
+      - ../src/kwork_parser_bot/.env
+    volumes:
+      - redis-data:/bitnami/redis/data
+    restart: always
+
+volumes:
+  redis-data:
+    labels:
+      keep:

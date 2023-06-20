@@ -1,0 +1,8 @@
+aiogram==3.0.0b7
+python-dotenv
+pydantic
+black
+loguru
+jinja2
+stringcase
+kwork

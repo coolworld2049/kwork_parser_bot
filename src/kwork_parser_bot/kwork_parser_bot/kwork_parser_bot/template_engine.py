@@ -1,0 +1,28 @@
+from typing import Optional, Any, Dict
+
+from jinja2 import Environment, PackageLoader, select_autoescape
+
+from kwork_parser_bot.core.config import get_app_settings
+
+env = Environment(
+    loader=PackageLoader(get_app_settings().project_path.name, "templates"),
+    autoescape=select_autoescape(["html"]),
+)
+
+
+def render_template(name: str, values: Optional[Dict[str, Any]] = None, **kwargs):
+    """
+    Renders template & returns text
+    :param name: Name of template
+    :param values: Values for template (optional)
+    :param kwargs: Keyword-arguments for template (high-priority)
+    """
+
+    template = env.get_template(name)
+
+    if values:
+        rendered_template = template.render(values, **kwargs)
+    else:
+        rendered_template = template.render(**kwargs)
+
+    return rendered_template

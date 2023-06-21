@@ -10,7 +10,9 @@ from sqlalchemy.ext.asyncio import (
 from kwork_parser_bot.core.config import get_app_settings
 
 engine = create_async_engine(
-    f"sqlite+aiosqlite:///{get_app_settings().pkg_path}/db/{get_app_settings().PROJECT_NAME}.sqlite", echo=True)
+    f"sqlite+aiosqlite:///{get_app_settings().pkg_path}/db/{get_app_settings().PROJECT_NAME}.sqlite",
+    echo=True,
+)
 session = async_sessionmaker(engine, autocommit=False)
 
 

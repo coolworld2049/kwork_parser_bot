@@ -1,0 +1,9 @@
+{% for job in jobs %}
+
+<b>Id — <code>{{ job.id }}</code></b>
+<b>Trigger — {{ job.trigger }}</b>
+<b>Func — {{ job.func.__name__ }}</b>
+<b>Args — {{ job.args }}</b>
+<b>Kwargs — {{ job.kwargs }}</b>
+<b>Next run time — {{ job.next_run_time }}</b>
+{% endfor %}

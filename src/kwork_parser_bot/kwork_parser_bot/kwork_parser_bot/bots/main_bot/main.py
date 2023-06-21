@@ -4,8 +4,12 @@ from aiogram import Dispatcher
 from loguru import logger
 
 from kwork_parser_bot.bots.dispatcher import dp
-from kwork_parser_bot.bots.main_bot.handlers import base, categories
-from kwork_parser_bot.bots.main_bot.loader import main_bot
+from kwork_parser_bot.bots.main_bot.handlers import (
+    base_commands,
+    kwork,
+    scheduler,
+)
+from kwork_parser_bot.bots.main_bot.loader import main_bot, async_scheduler
 from kwork_parser_bot.core.config import get_app_settings
 
 
@@ -14,7 +18,13 @@ async def startup(dp: Dispatcher) -> None:
         await main_bot.delete_my_commands()
     else:
         await main_bot.set_my_commands(commands=get_app_settings().BOT_COMMANDS)
-    dp.include_routers(base.router, categories.router)
+    dp.include_routers(
+        base_commands.router,
+        kwork.router,
+        scheduler.router,
+    )
+    logger.info("Start scheduler_jobs!")
+    async_scheduler.start()
     logger.info("Start polling!")
 
 

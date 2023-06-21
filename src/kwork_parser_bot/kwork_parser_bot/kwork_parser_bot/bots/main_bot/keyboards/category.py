@@ -5,7 +5,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from kwork.types import Category
 from kwork.types.category import Subcategory
 
-from kwork_parser_bot.bots.main_bot.callbacks.base import CategoryCallback
+from kwork_parser_bot.bots.main_bot.callbacks.all import CategoryCallback
 
 
 def category_keyboard_builder(

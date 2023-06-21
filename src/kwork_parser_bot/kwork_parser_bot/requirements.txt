@@ -8,6 +8,9 @@ jinja2
 stringcase
 kwork
 sqlalchemy
-aiosqlite
+apscheduler
 sqlalchemy-mixins
 pandas
+cron-validator
+pytest
+pytest-asyncio

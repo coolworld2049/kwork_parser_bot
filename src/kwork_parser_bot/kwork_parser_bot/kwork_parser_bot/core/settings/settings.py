@@ -14,12 +14,12 @@ project_path = pathlib.Path(__file__).parent.parent.parent
 
 class BotSettings(BaseAppSettings):
     BOT_TOKEN: str
-
     BOT_COMMANDS: list[BotCommand] = [
         BotCommand(command="/start", description="start the main_bot"),
         BotCommand(command="/help", description="get help"),
-        BotCommand(command="/categories", description="categories"),
+        BotCommand(command="/cancel", description="exit from any state"),
     ]
+    BOT_SUPPORT: Optional[str] = "https://t.me/kworkAdsParserSupport"
 
 
 class RedisSettings(BaseAppSettings):
@@ -36,6 +36,8 @@ class Settings(BotSettings, RedisSettings):
     STAGE: str
     KWORK_LOGIN: Optional[str]
     KWORK_PASSWORD: Optional[str]
+    KWORK_PHONE_LAST: Optional[str]
+    TIMEZONE: Optional[str] = "Europe/Moscow"
     LOG_FILE_PATH: Optional[str] = f"{project_path}/.logs/access.log"
     LOGGING_LEVEL: str = logging.getLevelName(os.getenv("LOGGING_LEVEL", "INFO"))
 

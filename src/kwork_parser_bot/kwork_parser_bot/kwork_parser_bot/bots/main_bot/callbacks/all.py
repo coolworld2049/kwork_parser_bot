@@ -18,7 +18,6 @@ class NavigationCallback(CallbackData, prefix="to"):
 
 class SchedulerCallback(CallbackData, prefix="sched"):
     name: str | None
-    user_id: str | None
     action: str | None
     category_id: int | None
     subcategory_id: int | None

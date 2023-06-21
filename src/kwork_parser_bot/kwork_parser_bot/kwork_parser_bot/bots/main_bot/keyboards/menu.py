@@ -18,6 +18,6 @@ def menu_keyboard_builder():
             callback_data=MenuCallback(
                 name="sched",
             ).pack(),
-        )
+        ),
     )
     return builder

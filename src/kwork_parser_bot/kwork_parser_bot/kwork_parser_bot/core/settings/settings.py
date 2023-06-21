@@ -29,6 +29,7 @@ class RedisSettings(BaseAppSettings):
     REDIS_MASTER_PASSWORD: str
     REDIS_PASSWORD: str
     REDIS_DATABASE: Optional[int] = 5
+    REDIS_MAX_CONNECTIONS: Optional[int] = 1000
 
 
 class Settings(BotSettings, RedisSettings):

@@ -7,11 +7,9 @@ from kwork_parser_bot.schemas.project import ProjectExtended
 from kwork_parser_bot.template_engine import render_template
 
 
-async def notify_about_new_projects(
-    user_id: int, callback: str, categories_ids: list[int]
-):
+async def notify_about_new_projects(user_id: int, categories_ids: int | list[int]):
     projects = await cached_projects(
-        redis, prefix=callback, categories_ids=categories_ids
+        redis, prefix=str(user_id), categories_ids=categories_ids
     )
     projects = [ProjectExtended(**x.dict()) for x in projects]
     rendered = render_template(

@@ -7,5 +7,5 @@ main_bot = Bot(get_app_settings().BOT_TOKEN, parse_mode="HTML")
 async_scheduler = AsyncIOScheduler(timezone=get_app_settings().TIMEZONE)
 async_scheduler.add_jobstore(
     "sqlalchemy",
-    url=f"sqlite:///{get_app_settings().pkg_path}/{get_app_settings().PROJECT_NAME}_jobstore.sqlite",
+    url=f"sqlite:///{get_app_settings().pkg_path}/bots/main_bot/sched/jobstore.sqlite",
 )

@@ -6,7 +6,7 @@ def navigation_keyboard_builder(
     builder: InlineKeyboardBuilder = None,
     back_callback: str = None,
     menu_callback: str = None,
-    inline_buttons: list[InlineKeyboardButton] = None
+    inline_buttons: list[InlineKeyboardButton] = None,
 ):
     if not back_callback and not menu_callback:
         return None
@@ -16,13 +16,17 @@ def navigation_keyboard_builder(
         InlineKeyboardButton(
             text="👈 Back",
             callback_data=back_callback,
-        ) if back_callback else None,
+        )
+        if back_callback
+        else None,
         InlineKeyboardButton(
             text="👈 Menu",
             callback_data=menu_callback,
-        ) if menu_callback else None,
+        )
+        if menu_callback
+        else None,
     ]
     buttons = list(filter(lambda x: x is not None, buttons))
-    buttons.append(inline_buttons) if inline_buttons else None
+    builder.row(*inline_buttons) if inline_buttons else None
     builder.row(*buttons, width=len(buttons) if len(buttons) <= 2 else 2)
     return builder

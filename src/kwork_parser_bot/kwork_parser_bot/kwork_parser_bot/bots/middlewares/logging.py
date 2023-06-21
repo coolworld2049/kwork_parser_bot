@@ -16,5 +16,5 @@ class LoggingMiddleware(BaseMiddleware):
         result = await handler(event, data)
         pprint(event, compact=True)
         pprint(data, compact=True)
-        print(f"result:{result}\n\n")
+        print(f"result:{result}\n")
         return result

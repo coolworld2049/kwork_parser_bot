@@ -9,15 +9,7 @@ def scheduler_keyboard_builder():
     builder.add(
         InlineKeyboardButton(
             text="👀 Get jobs",
-            callback_data=SchedulerCallback(
-                action="get"
-            ).pack(),
+            callback_data=SchedulerCallback(action="get").pack(),
         ),
-        InlineKeyboardButton(
-            text="🗑️ Remove job",
-            callback_data=SchedulerCallback(
-                action="remove"
-            ).pack(),
-        )
     )
     return builder

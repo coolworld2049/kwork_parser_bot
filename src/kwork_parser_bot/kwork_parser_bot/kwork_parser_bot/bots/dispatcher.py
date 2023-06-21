@@ -12,7 +12,9 @@ redis = Redis(
     port=get_app_settings().REDIS_MASTER_PORT_NUMBER,
     password=get_app_settings().REDIS_PASSWORD,
     db=get_app_settings().REDIS_DATABASE,
+    max_connections=get_app_settings().REDIS_MAX_CONNECTIONS
 )
+
 dp = Dispatcher(
     storage=RedisStorage(redis) if get_app_settings().USE_REDIS else MemoryStorage()
 )

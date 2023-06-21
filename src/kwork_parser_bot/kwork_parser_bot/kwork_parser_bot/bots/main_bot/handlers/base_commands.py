@@ -1,12 +1,15 @@
-from datetime import timedelta
+from contextlib import suppress
 
 from aiogram import Router, F
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
-from kwork_parser_bot.bots.dispatcher import redis
-from kwork_parser_bot.bots.main_bot.callbacks.all import MenuCallback, CategoryCallback
+from kwork_parser_bot.bots.main_bot.callbacks.all import (
+    MenuCallback,
+    CategoryCallback,
+)
 from kwork_parser_bot.bots.main_bot.keyboards.menu import menu_keyboard_builder
 from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.core.config import get_app_settings
@@ -15,30 +18,9 @@ from kwork_parser_bot.template_engine import render_template
 router = Router(name=__file__)
 
 
-async def delete_messages(user_id, message_id):
-    r_key = f"{user_id}_first_message_id"
-    first_message_id = await redis.get(r_key)
-    if not first_message_id:
-        await redis.set(
-            r_key,
-            message_id,
-            ex=timedelta(hours=1),
-        )
-    else:
-        try:
-            for _message_id in range(int(first_message_id), message_id):
-                await main_bot.delete_message(user_id, _message_id)
-        except:
-            pass
-        await redis.set(
-            r_key,
-            message_id,
-            ex=timedelta(hours=1),
-        )
-
-
 @router.message(Command("start"))
 async def start_message(message: Message, state: FSMContext):
+    await main_bot.delete_message(message.from_user.id, message.message_id - 1)
     await state.clear()
     await message.answer(
         render_template(
@@ -54,6 +36,8 @@ async def start_message(message: Message, state: FSMContext):
 async def start_callback(
     query: CallbackQuery, callback_data: CategoryCallback, state: FSMContext
 ):
+    with suppress(TelegramBadRequest):
+        await main_bot.delete_message(query.from_user.id, query.message.message_id - 1)
     await state.clear()
     await query.message.delete()
     await main_bot.send_message(
@@ -64,14 +48,6 @@ async def start_callback(
             settings=get_app_settings(),
         ),
         reply_markup=menu_keyboard_builder().as_markup(),
-    )
-
-
-@router.message(Command("start"))
-async def help(message: Message):
-    commands = {x.command: x.description for x in get_app_settings().BOT_COMMANDS}
-    await message.answer(
-        render_template("help.html", bot_commands=commands, settings=get_app_settings())
     )
 
 

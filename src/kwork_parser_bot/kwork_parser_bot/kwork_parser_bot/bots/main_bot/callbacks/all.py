@@ -10,6 +10,7 @@ class CategoryCallback(CallbackData, prefix="cat"):
 class MenuCallback(CallbackData, prefix="menu"):
     name: str
     action: str | None
+    message_id: int | None
 
 
 class NavigationCallback(CallbackData, prefix="to"):
@@ -21,3 +22,4 @@ class SchedulerCallback(CallbackData, prefix="sched"):
     action: str | None
     category_id: int | None
     subcategory_id: int | None
+    user_id: int | None

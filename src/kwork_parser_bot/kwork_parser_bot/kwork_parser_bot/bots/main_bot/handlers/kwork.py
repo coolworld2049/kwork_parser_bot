@@ -25,7 +25,11 @@ from kwork_parser_bot.bots.main_bot.sched.jobs.notify_about_new_projects import 
     notify_about_new_projects,
 )
 from kwork_parser_bot.bots.main_bot.states import CategoryState, SchedulerState
-from kwork_parser_bot.bots.main_bot.thirdparty.kwork.main import cached_categories
+from kwork_parser_bot.bots.main_bot.thirdparty.kwork.main import (
+    cached_categories,
+    get_parent_category,
+    get_category,
+)
 from kwork_parser_bot.core.config import get_app_settings
 from kwork_parser_bot.schemas import Action
 from kwork_parser_bot.template_engine import render_template
@@ -92,16 +96,22 @@ async def subcategory_action(
     query: CallbackQuery, callback_data: CategoryCallback, state: FSMContext
 ):
     state_data = await state.get_data()
+    categories: list[Category] = state_data.get("categories")
     category_id: int = state_data.get("category_id")
     subcategory_id: int = callback_data.category_id
+    parent_category = get_parent_category(categories, category_id)
+    category = get_category(categories, parent_category.id, subcategory_id)
+    action_name = f"{parent_category.name},{category.name}"
     subcategory_actions = [
         Action(
             text="⚙️ Уведомлять о новых проектах в подкатегории",
+            name=action_name,
             callback=SchedulerCallback(
                 name="job",
                 action="add",
                 category_id=category_id,
                 subcategory_id=subcategory_id,
+                user_id=query.from_user.id,
             ),
         )
     ]
@@ -125,7 +135,8 @@ async def subcategory_action(
 
 
 @router.callback_query(
-    SchedulerCallback.filter(F.name == "job" and F.action == "add"), SchedulerState.add_job_process_input
+    SchedulerCallback.filter(F.name == "job" and F.action == "add"),
+    SchedulerState.add_job_process_input,
 )
 async def scheduler_add_job_process_trigger(
     query: CallbackQuery, callback_data: CategoryCallback, state: FSMContext
@@ -162,15 +173,18 @@ async def scheduler_add_job_process(message: Message, state: FSMContext):
 
     job_id = actions[0].callback.pack()
     try:
+        cron_trigger = CronTrigger.from_crontab(
+            message.text, timezone=get_app_settings().TIMEZONE
+        )
         job = async_scheduler.add_job(
             notify_about_new_projects,
-            CronTrigger.from_crontab(message.text, timezone=get_app_settings().TIMEZONE),
-            kwargs={
-                "user_id": message.from_user.id,
-                "categories_ids": [category_id],
-            },
+            cron_trigger,
+            args=(
+                message.from_user.id,
+                [category_id],
+            ),
             id=job_id,
-            name=actions[0].callback.pack(),
+            name=actions[0].name,
         )
     except ConflictingIdError:
         await message.answer("Job with this id already exist")

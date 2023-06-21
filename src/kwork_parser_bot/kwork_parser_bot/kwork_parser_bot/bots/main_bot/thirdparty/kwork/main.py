@@ -47,10 +47,8 @@ async def cached_projects(
         return projects
 
 
-def get_category(categories: list[Category | Subcategory], category_id: int):
-    item = list(
-        filter(lambda x: x.id == category_id, categories)
-    )
+def get_parent_category(categories: list[Category | Subcategory], category_id: int):
+    item = list(filter(lambda x: x.id == category_id, categories))
     if item:
         item = item.pop()
     else:
@@ -58,7 +56,7 @@ def get_category(categories: list[Category | Subcategory], category_id: int):
     return item
 
 
-def get_subcategory(categories: list[Category], category_id: int, subcategory_id: int):
-    category = get_category(categories, category_id)
-    subcategory = get_category(category.subcategories, subcategory_id)
-    return subcategory
+def get_category(categories: list[Category], parent_category_id: int, category_id: int):
+    parent_category = get_parent_category(categories, parent_category_id)
+    category = get_parent_category(parent_category.subcategories, category_id)
+    return category

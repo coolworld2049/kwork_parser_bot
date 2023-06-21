@@ -1,13 +1,9 @@
 New Projects
 {% for project in projects %}
-<b>{{loop.index}}. {{project.title}}
-{{ project.project_url }}
-price — {{project.price}}
-offers — {{project.offers}}
-time_left — {{project.time_left_datetime}}
-parent_category_id — {{project.parent_category_id}}
-category_id — {{project.category_id}}
-date_confirm — {{project.date_confirm_datetime}}</b>
+{{loop.index}}. <a href="{{ project.project_url }}">{{project.title}}</a>
+Price — {{project.price}}
+Offers — {{project.offers}}
+Time left — {{project.time_left_time}}
+Category — {{project.parent_category_id}}, {{project.category_id}}
+Date confirm — {{project.date_confirm_datetime}}
 {% endfor %}
-
-

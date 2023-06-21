@@ -28,7 +28,7 @@ async def scheduler(query: CallbackQuery, callback_data: CategoryCallback):
     scheduler_builder = scheduler_keyboard_builder()
     builder = navigation_keyboard_builder(
         menu_callback=MenuCallback(name="start").pack(),
-        inline_buttons=scheduler_builder.buttons
+        inline_buttons=scheduler_builder.buttons,
     )
     await main_bot.send_message(
         query.from_user.id,
@@ -51,7 +51,7 @@ async def scheduler_get(query: CallbackQuery, callback_data: CategoryCallback):
     builder = navigation_keyboard_builder(
         back_callback=MenuCallback(name="sched").pack(),
         menu_callback=MenuCallback(name="start").pack(),
-        inline_buttons=buttons
+        inline_buttons=buttons,
     )
     if jobs:
         await main_bot.send_message(
@@ -73,13 +73,30 @@ async def scheduler_get(query: CallbackQuery, callback_data: CategoryCallback):
 async def scheduler_add_process_input(
     query: CallbackQuery, callback_data: CategoryCallback, state: FSMContext
 ):
-    await query.answer(f"Enter job id")
+    await query.answer(f"Enter a job ID or a list of job IDs separated by `,`")
     await state.set_state(SchedulerState.remove_job)
     await state.update_data(prev_message_id=query.message.message_id)
 
 
+async def remove_job(job_id: str | list[str]):
+    results = []
+    if not isinstance(job_id, list):
+        job_id = [job_id]
+    for id in job_id:
+        try:
+            async_scheduler.remove_job(id)
+        except Exception as e:
+            logger.debug(e)
+        if not async_scheduler.get_job(id):
+            results.append(f"Successfully deleted {id}")
+        else:
+            results.append(f"Failed to delete {id}")
+    return results
+
+
 @router.message(SchedulerState.remove_job)
 async def scheduler_delete_job_process(message: Message, state: FSMContext):
+    job_id = message.text.strip(" ").split(",")
     state_data = await state.get_data()
     await main_bot.delete_message(
         message.from_user.id, state_data.get("prev_message_id")
@@ -88,16 +105,6 @@ async def scheduler_delete_job_process(message: Message, state: FSMContext):
         back_callback=MenuCallback(name="sched").pack(),
         menu_callback=MenuCallback(name="start").pack(),
     )
-    if not async_scheduler.get_job(message.text):
-        await message.reply(f"Job not found", reply_markup=builder.as_markup())
-        await state.clear()
-        return None
-    try:
-        async_scheduler.remove_job(message.text)
-    except Exception as e:
-        logger.debug(e)
-    if not async_scheduler.get_job(message.text):
-        await message.reply(f"Successfully deleted", reply_markup=builder.as_markup())
-        await state.clear()
-    else:
-        await message.reply(f"Failed to delete", reply_markup=builder.as_markup())
+    results = await remove_job(job_id)
+    await message.reply(str(results), reply_markup=builder.as_markup())
+    await state.clear()

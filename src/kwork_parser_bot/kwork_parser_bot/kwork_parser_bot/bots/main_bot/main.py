@@ -5,7 +5,8 @@ from loguru import logger
 
 from kwork_parser_bot.bots.dispatcher import dp
 from kwork_parser_bot.bots.main_bot.handlers import (
-    base_commands,
+    help,
+    start,
     kwork,
     scheduler,
 )
@@ -20,7 +21,8 @@ async def startup(dp: Dispatcher) -> None:
     else:
         await main_bot.set_my_commands(commands=get_app_settings().BOT_COMMANDS)
     dp.include_routers(
-        base_commands.router,
+        start.router,
+        help.router,
         kwork.router,
         scheduler.router,
     )

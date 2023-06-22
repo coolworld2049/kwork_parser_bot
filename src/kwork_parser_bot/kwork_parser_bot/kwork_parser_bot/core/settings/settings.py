@@ -16,7 +16,6 @@ class BotSettings(BaseAppSettings):
     BOT_TOKEN: str
     BOT_COMMANDS: list[BotCommand] = [
         BotCommand(command="/start", description="start the main_bot"),
-        BotCommand(command="/cancel", description="exit from any state"),
     ]
     BOT_SUPPORT: Optional[str] = "https://t.me/kworkAdsParserSupport"
 

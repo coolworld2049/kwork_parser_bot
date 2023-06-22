@@ -15,10 +15,15 @@ from kwork_parser_bot.bots.main_bot.callbacks import (
     SchedulerCallback,
     MenuCallback,
 )
-from kwork_parser_bot.bots.main_bot.handlers.base_commands import start_message
-from kwork_parser_bot.bots.main_bot.keyboards.kwork import category_keyboard_builder, action_keyboard_builder, \
-    kwork_menu_keyboard_builder
-from kwork_parser_bot.bots.main_bot.keyboards.menu import navigation_keyboard_builder
+from kwork_parser_bot.bots.main_bot.handlers.start import start_message
+from kwork_parser_bot.bots.main_bot.keyboards.kwork import (
+    category_keyboard_builder,
+    category_action_keyboard_builder,
+    kwork_menu_keyboard_builder,
+)
+from kwork_parser_bot.bots.main_bot.keyboards.menu import (
+    menu_navigation_keyboard_builder,
+)
 from kwork_parser_bot.bots.main_bot.loader import main_bot, async_scheduler
 from kwork_parser_bot.bots.main_bot.sched.jobs.notify_about_new_projects import (
     notify_about_new_projects,
@@ -37,13 +42,10 @@ router = Router(name=__file__)
 
 
 @router.callback_query(MenuCallback.filter(F.name == "kwork"))
-async def kwork_menu(
-    query: CallbackQuery
-):
+async def kwork_menu(query: CallbackQuery):
     builder = kwork_menu_keyboard_builder()
-    builder = navigation_keyboard_builder(
-        builder,
-        menu_callback=MenuCallback(name="start").pack(),
+    builder = menu_navigation_keyboard_builder(
+        builder, menu_callback=MenuCallback(name="start").pack()
     )
     await main_bot.send_message(
         query.from_user.id,
@@ -60,7 +62,7 @@ async def category(
     categories = await cached_categories(redis)
     builder = category_keyboard_builder(categories)
     builder.adjust(2)
-    builder = navigation_keyboard_builder(
+    builder = menu_navigation_keyboard_builder(
         builder,
         back_callback=MenuCallback(name="kwork").pack(),
         menu_callback=MenuCallback(name="start").pack(),
@@ -91,7 +93,7 @@ async def subcategory(
         logger.debug(f"{inspect.currentframe().f_code}: {builder}")
         return None
     builder.adjust(2)
-    builder = navigation_keyboard_builder(
+    builder = menu_navigation_keyboard_builder(
         builder,
         back_callback=MenuCallback(name="kwork").pack(),
         menu_callback=MenuCallback(name="start").pack(),
@@ -132,9 +134,9 @@ async def subcategory_action(
             ),
         )
     ]
-    builder = action_keyboard_builder(actions)
+    builder = category_action_keyboard_builder(actions)
     builder.adjust(1)
-    builder = navigation_keyboard_builder(
+    builder = menu_navigation_keyboard_builder(
         builder,
         back_callback=MenuCallback(name="kwork").pack(),
         menu_callback=MenuCallback(name="start").pack(),
@@ -157,14 +159,14 @@ async def scheduler_add_job_trigger_process(
     query: CallbackQuery, callback_data: CategoryCallback, state: FSMContext
 ):
     await state.set_state(SchedulerState.add_job)
-    builder = navigation_keyboard_builder(
+    builder = menu_navigation_keyboard_builder(
         back_callback=MenuCallback(name="kwork").pack(),
         menu_callback=MenuCallback(name="start").pack(),
     )
     message = await main_bot.send_message(
         query.from_user.id,
         render_template(
-            "job_cron_trigger.html",
+            "cron.html",
         ),
         reply_markup=builder.as_markup(),
     )

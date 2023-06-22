@@ -30,7 +30,7 @@ def menu_keyboard_builder():
     return builder
 
 
-def navigation_keyboard_builder(
+def menu_navigation_keyboard_builder(
     builder: InlineKeyboardBuilder = None,
     back_callback: str = None,
     menu_callback: str = None,

@@ -4,7 +4,9 @@ from kwork_parser_bot.bots.dispatcher import redis
 from kwork_parser_bot.bots.main_bot.callbacks import (
     MenuCallback,
 )
-from kwork_parser_bot.bots.main_bot.keyboards.menu import navigation_keyboard_builder
+from kwork_parser_bot.bots.main_bot.keyboards.menu import (
+    menu_navigation_keyboard_builder,
+)
 from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.bots.main_bot.thirdparty.kwork.main import (
     cached_projects,
@@ -35,8 +37,8 @@ async def notify_about_new_projects(user_id: int, categories_ids: int | list[int
         "projects.html",
         projects=new_projects,
     )
-    builder = navigation_keyboard_builder(
-        menu_callback=MenuCallback(name="start").pack(),
+    builder = menu_navigation_keyboard_builder(
+        menu_callback=MenuCallback(name="start").pack()
     )
     if len(rendered) < 4096:
         await main_bot.send_message(

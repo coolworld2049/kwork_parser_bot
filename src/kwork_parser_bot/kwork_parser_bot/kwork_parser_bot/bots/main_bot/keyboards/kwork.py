@@ -19,7 +19,7 @@ def kwork_menu_keyboard_builder():
         InlineKeyboardButton(
             text="👨‍💻 Account",
             callback_data=MenuCallback(name="account").pack(),
-        )
+        ),
     )
     return builder
 
@@ -53,7 +53,7 @@ def category_keyboard_builder(
     return builder
 
 
-def action_keyboard_builder(
+def category_action_keyboard_builder(
     actions: list[Action],
 ):
     builder = InlineKeyboardBuilder()

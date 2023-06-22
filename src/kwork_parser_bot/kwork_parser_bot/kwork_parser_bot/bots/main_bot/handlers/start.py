@@ -35,9 +35,7 @@ async def start_message(message: Message, state: FSMContext):
 
 
 @router.callback_query(MenuCallback.filter(F.name == "start"))
-async def start_callback(
-    query: CallbackQuery, state: FSMContext
-):
+async def start_callback(query: CallbackQuery, state: FSMContext):
     with suppress(TelegramBadRequest):
         await query.message.delete()
         await main_bot.delete_message(query.from_user.id, query.message.message_id - 1)

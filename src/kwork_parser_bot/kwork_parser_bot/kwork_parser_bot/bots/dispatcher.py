@@ -1,6 +1,8 @@
+import pathlib
+
 from aiogram import Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.fsm.storage.redis import RedisStorage
+from aiogram.fsm.storage.redis import RedisStorage, RedisEventIsolation
 from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 from redis.asyncio.client import Redis
 
@@ -17,9 +19,15 @@ redis = Redis(
 )
 
 dp = Dispatcher(
-    storage=RedisStorage(redis, state_ttl=1800, data_ttl=1800)
+    events_isolation=RedisEventIsolation(redis)
     if get_app_settings().USE_REDIS
-    else MemoryStorage()
+    else None,
+    storage=RedisStorage(redis, state_ttl=600, data_ttl=600)
+    if get_app_settings().USE_REDIS
+    else MemoryStorage(),
+    name=pathlib.Path(__file__).name
 )
-dp.update.middleware(LoggingMiddleware()) if get_app_settings().LOGGING_LEVEL == "DEBUG" else None
+dp.update.middleware(
+    LoggingMiddleware()
+) if get_app_settings().LOGGING_LEVEL == "DEBUG" else None
 dp.callback_query.middleware(CallbackAnswerMiddleware())

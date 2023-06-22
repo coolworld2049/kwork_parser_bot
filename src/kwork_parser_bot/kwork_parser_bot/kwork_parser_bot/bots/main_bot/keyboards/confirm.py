@@ -8,14 +8,14 @@ def confirm_keyboard_builder(name: str = "rmjob"):
     builder = InlineKeyboardBuilder()
     builder.add(
         InlineKeyboardButton(
-            text="Yes",
+            text="✔️",
             callback_data=ConfirmCallback(
                 name=name,
                 answer="yes",
             ).pack(),
         ),
         InlineKeyboardButton(
-            text="No",
+            text="❌",
             callback_data=ConfirmCallback(
                 name=name,
                 answer="no",

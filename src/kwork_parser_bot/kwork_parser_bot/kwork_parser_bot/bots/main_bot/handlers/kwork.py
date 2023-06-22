@@ -16,8 +16,8 @@ from kwork_parser_bot.bots.main_bot.callbacks import (
     MenuCallback,
 )
 from kwork_parser_bot.bots.main_bot.handlers.base_commands import start_message
-from kwork_parser_bot.bots.main_bot.keyboards.action import action_keyboard_builder
-from kwork_parser_bot.bots.main_bot.keyboards.category import category_keyboard_builder
+from kwork_parser_bot.bots.main_bot.keyboards.kwork import category_keyboard_builder, action_keyboard_builder, \
+    kwork_menu_keyboard_builder
 from kwork_parser_bot.bots.main_bot.keyboards.menu import navigation_keyboard_builder
 from kwork_parser_bot.bots.main_bot.loader import main_bot, async_scheduler
 from kwork_parser_bot.bots.main_bot.sched.jobs.notify_about_new_projects import (
@@ -37,6 +37,23 @@ router = Router(name=__file__)
 
 
 @router.callback_query(MenuCallback.filter(F.name == "kwork"))
+async def kwork_menu(
+    query: CallbackQuery
+):
+    builder = kwork_menu_keyboard_builder()
+    builder = navigation_keyboard_builder(
+        builder,
+        menu_callback=MenuCallback(name="start").pack(),
+    )
+    await main_bot.send_message(
+        query.from_user.id,
+        text="🤖 Kwork Menu 🤖",
+        reply_markup=builder.as_markup(),
+    )
+    await query.message.delete()
+
+
+@router.callback_query(MenuCallback.filter(F.name == "category" and F.action == "get"))
 async def category(
     query: CallbackQuery, callback_data: CategoryCallback, state: FSMContext
 ):
@@ -45,6 +62,7 @@ async def category(
     builder.adjust(2)
     builder = navigation_keyboard_builder(
         builder,
+        back_callback=MenuCallback(name="kwork").pack(),
         menu_callback=MenuCallback(name="start").pack(),
     )
     await main_bot.send_message(

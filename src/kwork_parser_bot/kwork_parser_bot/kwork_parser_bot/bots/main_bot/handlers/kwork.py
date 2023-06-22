@@ -22,7 +22,8 @@ from kwork_parser_bot.bots.main_bot.states import SchedulerState
 from kwork_parser_bot.bots.main_bot.thirdparty.kwork.main import (
     cached_categories,
     get_parent_category,
-    get_category, kwork_api,
+    get_category,
+    kwork_api,
 )
 from kwork_parser_bot.schemas import SchedJob
 
@@ -33,7 +34,7 @@ router = Router(name=__file__)
 
 @router.callback_query(MenuCallback.filter(F.name == "kwork"))
 async def kwork_menu(query: CallbackQuery, state: FSMContext):
-    sched_jobs = [
+    sched_jobs = [  # Todo
         SchedJob(
             text="🔔 Receive account notifications",
             callback=SchedulerCallback(
@@ -50,9 +51,9 @@ async def kwork_menu(query: CallbackQuery, state: FSMContext):
         )
     ]
     builder = kwork_menu_keyboard_builder()
-    builder_sched_jobs = sched_jobs_keyboard_builder(sched_jobs)
-    builder.add(*list(builder_sched_jobs.buttons))
-    builder.adjust(2)
+    # builder_sched_jobs = sched_jobs_keyboard_builder(sched_jobs)
+    # builder.add(*list(builder_sched_jobs.buttons))
+    # builder.adjust(2)
     builder = menu_navigation_keyboard_builder(
         builder, menu_callback=MenuCallback(name="start").pack()
     )

@@ -2,10 +2,12 @@ import json
 from datetime import timedelta
 
 from kwork import Kwork
-from kwork.types import Category
+from kwork.types import Category, Actor
 from kwork.types.category import Subcategory
 from redis.asyncio.client import Redis
 
+from kwork_parser_bot.bots.dispatcher import redis
+from kwork_parser_bot.bots.redis.caching import cached_data
 from kwork_parser_bot.core.config import get_app_settings
 
 kwork_api = Kwork(
@@ -13,6 +15,16 @@ kwork_api = Kwork(
     password=get_app_settings().KWORK_PASSWORD,
     phone_last=get_app_settings().KWORK_PHONE_LAST,
 )
+
+
+async def get_my_account(user_id: int):
+    account: Actor = await cached_data(
+        redis,
+        kwork_api.get_me,
+        key=f"kwork_api_me:{str(user_id)}",
+        ex=timedelta(hours=1)
+    )
+    return account
 
 
 async def cached_categories(
@@ -26,7 +38,6 @@ async def cached_categories(
         await redis.set(key, json.dumps([x.json() for x in categories]), ex=ex)
         return categories
     else:
-        expire = await redis.expire(key, ex)
         persist = await redis.persist(key)
         categories = [Category(**json.loads(data)) for data in json.loads(categories)]
         return categories

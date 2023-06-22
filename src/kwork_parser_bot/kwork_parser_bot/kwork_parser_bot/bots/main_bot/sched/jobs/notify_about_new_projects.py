@@ -71,7 +71,9 @@ async def notify_about_new_projects(
                 disable_web_page_preview=True,
             )
             send_messages.append(send_message)
-    logger.debug(f"func completed:{__file__}, send_messages:{[x.message_id for x in send_messages]}")
+    logger.debug(
+        f"func completed:{__file__}, send_messages:{[x.message_id for x in send_messages]}"
+    )
 
 
 if __name__ == "__main__":

@@ -6,9 +6,17 @@ from redis.asyncio.client import Redis
 
 
 async def cached_data(
-    redis: Redis, data: typing.Any, key: str, ex: timedelta = timedelta(days=30)
+    redis: Redis,
+    func: typing.Any = None,
+    *,
+    key: str,
+    ex: timedelta = timedelta(days=1)
 ):
-    data: bytes = await redis.get(key)
-    if not data:
-        await redis.set(key, json.dumps(data), ex=ex)
-    return data
+    cache_data: bytes = await redis.get(key)
+    if not cache_data:
+        data = await func()
+        await redis.set(key, json.dumps(data.dict()), ex=ex)
+        persist = await redis.persist(key)
+        return data
+    else:
+        return json.loads(cache_data)

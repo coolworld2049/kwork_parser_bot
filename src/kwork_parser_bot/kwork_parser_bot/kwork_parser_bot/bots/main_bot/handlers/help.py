@@ -30,6 +30,7 @@ async def help_callback(
         query.from_user.id,
         render_template(
             "help.html",
+            user=query.from_user,
             bot_commands=commands,
             settings=get_app_settings(),
         ),

@@ -27,8 +27,4 @@ async def notify_about_kwork_notifications(
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(
-        notify_about_kwork_notifications(
-            1070277776, 1070277776
-        )
-    )
+    loop.run_until_complete(notify_about_kwork_notifications(1070277776, 1070277776))

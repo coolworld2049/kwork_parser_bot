@@ -31,8 +31,7 @@ from kwork_parser_bot.bots.main_bot.states import SchedulerState
 from kwork_parser_bot.bots.main_bot.thirdparty.kwork.main import (
     cached_categories,
     get_parent_category,
-    get_category,
-)
+    get_category, )
 from kwork_parser_bot.core.config import get_app_settings
 from kwork_parser_bot.schemas import Action
 from kwork_parser_bot.template_engine import render_template
@@ -120,6 +119,17 @@ async def subcategory_action(
                 subcategory_id=subcategory_id,
                 user_id=query.from_user.id,
             ),
+        ),
+        Action(
+            text="⚙️ Получать уведомления из аккаунта",
+            name=f"{parent_category.name},{category.name}",
+            callback=SchedulerCallback(
+                name="job",
+                action="add",
+                category_id=category_id,
+                subcategory_id=subcategory_id,
+                user_id=query.from_user.id,
+            ),
         )
     ]
     builder = category_action_keyboard_builder(actions)
@@ -149,7 +159,7 @@ async def subcategory_action(
     SchedulerState.add_job_process_input,
 )
 async def scheduler_add_job_trigger_process(
-    query: CallbackQuery, callback_data: CategoryCallback, state: FSMContext
+    query: CallbackQuery, state: FSMContext
 ):
     state_data = await state.get_data()
     category_id: int = state_data.get("category_id")
@@ -203,7 +213,12 @@ async def scheduler_add_job_process(message: Message, state: FSMContext):
         job = async_scheduler.add_job(
             notify_about_new_projects,
             cron_trigger,
-            args=(message.from_user.id, [category_id], job_id),
+            args=(
+                message.from_user.id,
+                message.from_user.id,
+                [category_id],
+                job_id,
+            ),
             id=job_id,
             name=actions[0].name,
         )

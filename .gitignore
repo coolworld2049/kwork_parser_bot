@@ -143,3 +143,4 @@ cython_debug/
 !/src/kwork_parser_bot/kwork_parser_bot/kwork_parser_bot/.logs/
 !/.env
 !/src/kwork_parser_bot/kwork_parser_bot/kwork_parser_bot/.logs/
+!/src/kwork_parser_bot/kwork_parser_bot/kwork_parser_bot/.logs/

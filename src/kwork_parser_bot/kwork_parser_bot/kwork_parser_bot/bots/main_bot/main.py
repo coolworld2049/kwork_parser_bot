@@ -20,6 +20,7 @@ async def startup(dp: Dispatcher) -> None:
         await main_bot.delete_my_commands()
     else:
         await main_bot.set_my_commands(commands=get_app_settings().BOT_COMMANDS)
+    await main_bot.delete_webhook(drop_pending_updates=True)
     dp.include_routers(
         start.router,
         help.router,

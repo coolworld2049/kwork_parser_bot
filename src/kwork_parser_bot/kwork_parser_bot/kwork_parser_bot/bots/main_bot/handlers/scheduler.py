@@ -19,7 +19,7 @@ from kwork_parser_bot.bots.main_bot.keyboards.scheduler import (
     scheduler_keyboard_builder,
 )
 from kwork_parser_bot.bots.main_bot.loader import main_bot
-from kwork_parser_bot.bots.main_bot.sched.main import remove_job, get_user_jobs
+from kwork_parser_bot.bots.main_bot.sched.main import remove_job, get_user_job
 from kwork_parser_bot.bots.main_bot.states import SchedulerState
 from kwork_parser_bot.core.config import get_app_settings
 from kwork_parser_bot.template_engine import render_template
@@ -29,7 +29,7 @@ router = Router(name=__file__)
 
 @router.callback_query(MenuCallback.filter(F.name == "sched"))
 async def scheduler_menu(query: CallbackQuery, state: FSMContext):
-    jobs = get_user_jobs(query.from_user.id)
+    jobs = get_user_job(query.from_user.id)
     builder = scheduler_keyboard_builder()
     builder = menu_navigation_keyboard_builder(
         menu_callback=MenuCallback(name="start").pack(),
@@ -51,6 +51,7 @@ async def scheduler_menu(query: CallbackQuery, state: FSMContext):
     else:
         await query.answer("No Job found")
         await start_callback(query, state)
+
 
 
 @router.callback_query(SchedulerCallback.filter(F.action == "rm"))

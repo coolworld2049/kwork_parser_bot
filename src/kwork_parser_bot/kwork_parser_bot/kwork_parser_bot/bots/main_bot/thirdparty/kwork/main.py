@@ -2,7 +2,7 @@ import json
 from datetime import timedelta
 
 from kwork import Kwork
-from kwork.types import Category, Project
+from kwork.types import Category
 from kwork.types.category import Subcategory
 from redis.asyncio.client import Redis
 
@@ -15,36 +15,23 @@ kwork_api = Kwork(
 )
 
 
-async def cached_categories(redis: Redis, ex: timedelta = timedelta(days=30)):
+async def cached_categories(
+    redis: Redis, ex: timedelta = timedelta(days=30), *, kwork_api: Kwork = None
+):
     # await redis.delete("kwork_api_categories")
-    categories: list[Category] | bytes = await redis.get("kwork_api_categories")
+    key = "kwork_api_categories"
+    categories: list[Category] | bytes = await redis.get(key)
     if not categories:
         categories: list[Category] = await kwork_api.get_categories()
         await redis.set(
-            "kwork_api_categories", json.dumps([x.json() for x in categories]), ex=ex
+            key, json.dumps([x.json() for x in categories]), ex=ex
         )
         return categories
     else:
+        expire = await redis.expire(key, ex)
+        persist = await redis.persist(key)
         categories = [Category(**json.loads(data)) for data in json.loads(categories)]
         return categories
-
-
-async def cached_projects(
-    redis: Redis,
-    ex: timedelta = timedelta(days=1),
-    *,
-    prefix: str,
-    categories_ids: list[int]
-):
-    # await redis.delete("kwork_api_categories")
-    projects: list[Project] | bytes = await redis.get(prefix)
-    if not projects:
-        projects: list[Project] = await kwork_api.get_projects(categories_ids)
-        await redis.set(prefix, json.dumps([x.json() for x in projects]), ex=ex)
-        return projects
-    else:
-        projects = [Project(**json.loads(data)) for data in json.loads(projects)]
-        return projects
 
 
 def get_parent_category(categories: list[Category | Subcategory], category_id: int):

@@ -3,9 +3,11 @@ from loguru import logger
 from kwork_parser_bot.bots.main_bot.loader import async_scheduler
 
 
-def get_user_jobs(user_id: int):
+def get_user_job(user_id: int, job_id: str = None):
     jobs = async_scheduler.get_jobs()
     jobs = list(filter(lambda x: str(user_id) in x.id, jobs))
+    if job_id:
+        jobs = async_scheduler.get_job(job_id)
     return jobs
 
 

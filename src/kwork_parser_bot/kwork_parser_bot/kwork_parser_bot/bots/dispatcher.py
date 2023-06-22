@@ -21,5 +21,5 @@ dp = Dispatcher(
     if get_app_settings().USE_REDIS
     else MemoryStorage()
 )
-dp.update.middleware(LoggingMiddleware()) if get_app_settings().STAGE == "dev" else None
+dp.update.middleware(LoggingMiddleware()) if get_app_settings().LOGGING_LEVEL == "DEBUG" else None
 dp.callback_query.middleware(CallbackAnswerMiddleware())

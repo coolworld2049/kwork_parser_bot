@@ -10,16 +10,15 @@ from kwork.types import Category
 from loguru import logger
 
 from kwork_parser_bot.bots.dispatcher import redis
-from kwork_parser_bot.bots.main_bot.callbacks.all import (
+from kwork_parser_bot.bots.main_bot.callbacks import (
     CategoryCallback,
     SchedulerCallback,
     MenuCallback,
 )
+from kwork_parser_bot.bots.main_bot.handlers.base_commands import start_message
 from kwork_parser_bot.bots.main_bot.keyboards.action import action_keyboard_builder
 from kwork_parser_bot.bots.main_bot.keyboards.category import category_keyboard_builder
-from kwork_parser_bot.bots.main_bot.keyboards.navigation import (
-    navigation_keyboard_builder,
-)
+from kwork_parser_bot.bots.main_bot.keyboards.menu import navigation_keyboard_builder
 from kwork_parser_bot.bots.main_bot.loader import main_bot, async_scheduler
 from kwork_parser_bot.bots.main_bot.sched.jobs.notify_about_new_projects import (
     notify_about_new_projects,
@@ -54,7 +53,7 @@ async def category(
         reply_markup=builder.as_markup(),
     )
     await state.clear()
-    await state.set_data(data={"categories": categories})
+    await state.update_data(data={"categories": categories})
     await state.set_state(CategoryState.select_subcategory)
     await query.message.delete()
 
@@ -102,7 +101,7 @@ async def subcategory_action(
     parent_category = get_parent_category(categories, category_id)
     category = get_category(categories, parent_category.id, subcategory_id)
     action_name = f"{parent_category.name},{category.name}"
-    subcategory_actions = [
+    actions = [
         Action(
             text="⚙️ Уведомлять о новых проектах в подкатегории",
             name=action_name,
@@ -115,7 +114,7 @@ async def subcategory_action(
             ),
         )
     ]
-    builder = action_keyboard_builder(subcategory_actions)
+    builder = action_keyboard_builder(actions)
     builder.adjust(1)
     builder = navigation_keyboard_builder(
         builder,
@@ -127,9 +126,7 @@ async def subcategory_action(
         text="🤖 Action Menu 🤖",
         reply_markup=builder.as_markup(),
     )
-    await state.update_data(
-        {"actions": subcategory_actions, "subcategory_id": subcategory_id}
-    )
+    await state.update_data({"actions": actions, "subcategory_id": subcategory_id})
     await state.set_state(SchedulerState.add_job_process_input)
     await query.message.delete()
 
@@ -138,7 +135,7 @@ async def subcategory_action(
     SchedulerCallback.filter(F.name == "job" and F.action == "add"),
     SchedulerState.add_job_process_input,
 )
-async def scheduler_add_job_process_trigger(
+async def scheduler_add_job_trigger_process(
     query: CallbackQuery, callback_data: CategoryCallback, state: FSMContext
 ):
     await state.set_state(SchedulerState.add_job)
@@ -173,7 +170,7 @@ async def scheduler_add_job_process(message: Message, state: FSMContext):
 
     job_id = actions[0].callback.pack()
     try:
-        cron_trigger = CronTrigger.from_crontab(
+        cron_trigger = CronTrigger(jitter=120).from_crontab(
             message.text, timezone=get_app_settings().TIMEZONE
         )
         job = async_scheduler.add_job(
@@ -189,12 +186,5 @@ async def scheduler_add_job_process(message: Message, state: FSMContext):
     except ConflictingIdError:
         await message.answer("Job with this id already exist")
         return None
-    builder = navigation_keyboard_builder(
-        menu_callback=MenuCallback(name="start").pack(),
-    )
-    await main_bot.send_message(
-        message.from_user.id,
-        render_template("scheduler_jobs.html", jobs=[job.__getstate__()]),
-        reply_markup=builder.as_markup(),
-    )
     await state.clear()
+    await start_message(message, state)

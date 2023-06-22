@@ -13,10 +13,13 @@ redis = Redis(
     password=get_app_settings().REDIS_PASSWORD,
     db=get_app_settings().REDIS_DATABASE,
     max_connections=get_app_settings().REDIS_MAX_CONNECTIONS,
+    encoding="utf-8",
 )
 
 dp = Dispatcher(
-    storage=RedisStorage(redis) if get_app_settings().USE_REDIS else MemoryStorage()
+    storage=RedisStorage(redis, state_ttl=1800, data_ttl=1800)
+    if get_app_settings().USE_REDIS
+    else MemoryStorage()
 )
-dp.update.middleware(LoggingMiddleware())
+dp.update.middleware(LoggingMiddleware()) if get_app_settings().STAGE == "dev" else None
 dp.callback_query.middleware(CallbackAnswerMiddleware())

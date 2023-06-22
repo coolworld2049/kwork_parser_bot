@@ -1,12 +1,10 @@
 import asyncio
 
 from kwork_parser_bot.bots.dispatcher import redis
-from kwork_parser_bot.bots.main_bot.callbacks.all import (
+from kwork_parser_bot.bots.main_bot.callbacks import (
     MenuCallback,
 )
-from kwork_parser_bot.bots.main_bot.keyboards.navigation import (
-    navigation_keyboard_builder,
-)
+from kwork_parser_bot.bots.main_bot.keyboards.menu import navigation_keyboard_builder
 from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.bots.main_bot.thirdparty.kwork.main import (
     cached_projects,
@@ -49,11 +47,7 @@ async def notify_about_new_projects(user_id: int, categories_ids: int | list[int
     else:
         for item in rendered.split("<b>"):
             await asyncio.sleep(2)
-            await main_bot.send_message(
-                user_id,
-                item,
-                reply_markup=builder.as_markup()
-            )
+            await main_bot.send_message(user_id, item, reply_markup=builder.as_markup())
 
 
 if __name__ == "__main__":

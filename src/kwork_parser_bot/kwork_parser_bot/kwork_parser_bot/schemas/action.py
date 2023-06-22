@@ -1,8 +1,6 @@
-from typing import Optional
-
 from pydantic import BaseModel
 
-from kwork_parser_bot.bots.main_bot.callbacks.all import SchedulerCallback
+from kwork_parser_bot.bots.main_bot.callbacks import SchedulerCallback
 
 
 class Action(BaseModel):

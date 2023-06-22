@@ -13,13 +13,14 @@ class MenuCallback(CallbackData, prefix="menu"):
     message_id: int | None
 
 
-class NavigationCallback(CallbackData, prefix="to"):
-    to: str
+class ConfirmCallback(CallbackData, prefix="confirm"):
+    name: str
+    answer: str
 
 
 class SchedulerCallback(CallbackData, prefix="sched"):
     name: str | None
     action: str | None
+    user_id: int | None
     category_id: int | None
     subcategory_id: int | None
-    user_id: int | None

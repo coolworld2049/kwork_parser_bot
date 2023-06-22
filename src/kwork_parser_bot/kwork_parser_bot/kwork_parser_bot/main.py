@@ -10,6 +10,6 @@ get_app_settings().configure_loguru()
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     try:
-        asyncio.run(run_main_bot())
+        loop.run_until_complete(run_main_bot())
     except Exception as e:
         logger.warning(e.args)

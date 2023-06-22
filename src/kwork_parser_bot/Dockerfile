@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.11-slim
 
 COPY kwork_parser_bot/requirements.txt /app/requirements.txt
 

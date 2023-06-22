@@ -1,11 +1,10 @@
+import pathlib
 from typing import Optional, Any, Dict
 
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-from kwork_parser_bot.core.config import get_app_settings
-
 env = Environment(
-    loader=PackageLoader(get_app_settings().project_path.name, "templates"),
+    loader=PackageLoader(pathlib.Path(__file__).parent.name, "templates"),
     autoescape=select_autoescape(["html"]),
 )
 

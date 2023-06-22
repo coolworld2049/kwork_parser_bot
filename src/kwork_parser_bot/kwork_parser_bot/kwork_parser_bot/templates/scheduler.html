@@ -1,7 +1,7 @@
 {% for job in jobs %}
 
 Id — <code>{{ job.id }}</code>
-Name — <em>{{ job.name }}</em>
+Name — <b>{{ job.name }}</b>
 Func — {{ job.func.__name__ }}
 Trigger — {{ job.trigger }}
 Next run time — <b>{{ job.next_run_time }}</b>

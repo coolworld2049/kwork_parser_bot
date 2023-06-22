@@ -19,7 +19,7 @@ class ConfirmCallback(CallbackData, prefix="confirm"):
 
 
 class SchedulerCallback(CallbackData, prefix="sched"):
-    name: str
+    name: str | None
     action: str | None
     user_id: int | None
     category_id: int | None

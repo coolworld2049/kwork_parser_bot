@@ -6,7 +6,7 @@ from kwork.types import Category
 from kwork.types.category import Subcategory
 
 from kwork_parser_bot.bots.main_bot.callbacks import CategoryCallback, MenuCallback
-from kwork_parser_bot.schemas import Action
+from kwork_parser_bot.schemas import SchedJob
 
 
 def kwork_menu_keyboard_builder():
@@ -59,15 +59,15 @@ def category_keyboard_builder(
     return builder
 
 
-def category_action_keyboard_builder(
-    actions: list[Action],
+def sched_job_keyboard_builder(
+    sched_jobs: list[SchedJob],
 ):
     builder = InlineKeyboardBuilder()
-    for action in actions:
+    for sched_job in sched_jobs:
         builder.add(
             InlineKeyboardButton(
-                text=action.text,
-                callback_data=action.callback.pack(),
+                text=sched_job.text,
+                callback_data=sched_job.callback.pack(),
             )
         )
     builder.adjust(1)

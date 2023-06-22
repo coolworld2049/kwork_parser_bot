@@ -53,7 +53,6 @@ async def scheduler_menu(query: CallbackQuery, state: FSMContext):
         await start_callback(query, state)
 
 
-
 @router.callback_query(SchedulerCallback.filter(F.action == "rm"))
 async def scheduler_remove_job_process(query: CallbackQuery, state: FSMContext):
     await query.answer(f"Enter a job ID e.g `aaa` or `aaa,bbb,ccc`")

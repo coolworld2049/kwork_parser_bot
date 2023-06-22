@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
-
-source ../src/${PROJECT_NAME?env PROJECT_NAME required}/.env
+source ../src/kwork_parser_bot/.env
 
 project_name=${PROJECT_NAME?env PROJECT_NAME required}
 compose_file=docker-compose.yml
 
 install() {
   docker pull coolworldocker/"$project_name"
-  docker-compose -p "$project_name" -f "$compose_file" up -d bot
+  docker-compose -p "$project_name" -f "$compose_file" up -d
 }
 
 delete() {

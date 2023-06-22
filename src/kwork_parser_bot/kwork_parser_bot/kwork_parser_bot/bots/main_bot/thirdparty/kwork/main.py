@@ -22,7 +22,7 @@ async def get_my_account(user_id: int):
         redis,
         kwork_api.get_me,
         key=f"kwork_api_me:{str(user_id)}",
-        ex=timedelta(hours=1)
+        ex=timedelta(hours=1),
     )
     return account
 

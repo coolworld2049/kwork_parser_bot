@@ -25,7 +25,7 @@ dp = Dispatcher(
     storage=RedisStorage(redis, state_ttl=600, data_ttl=600)
     if get_app_settings().USE_REDIS
     else MemoryStorage(),
-    name=pathlib.Path(__file__).name
+    name=pathlib.Path(__file__).name,
 )
 dp.update.middleware(
     LoggingMiddleware()

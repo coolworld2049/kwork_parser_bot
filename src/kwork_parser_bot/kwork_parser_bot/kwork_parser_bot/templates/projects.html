@@ -1,4 +1,4 @@
-New Projects
+New projects found by job <code>{{ job_id if job_id is not none else '' }}</code>
 {% for project in projects %}
 {{loop.index}}. <a href="{{ project.project_url }}">{{project.title}}</a>
 Price — {{project.price}}

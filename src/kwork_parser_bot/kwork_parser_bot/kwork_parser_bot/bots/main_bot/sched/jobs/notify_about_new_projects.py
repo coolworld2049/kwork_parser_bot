@@ -18,10 +18,12 @@ from kwork_parser_bot.schemas.project import ProjectExtended
 from kwork_parser_bot.template_engine import render_template
 
 
-async def notify_about_new_projects(user_id: int, categories_ids: int | list[int]):
+async def notify_about_new_projects(
+    chat_id: int, categories_ids: int | list[int], job_id: str = None
+):
     categories = await cached_categories(redis)
     projects = await cached_projects(
-        redis, prefix=str(user_id), categories_ids=categories_ids
+        redis, prefix=str(chat_id), categories_ids=categories_ids
     )
     new_projects = []
     for p in projects:
@@ -35,6 +37,7 @@ async def notify_about_new_projects(user_id: int, categories_ids: int | list[int
         new_projects.append(p)
     rendered = render_template(
         "projects.html",
+        job_id=job_id,
         projects=new_projects,
     )
     builder = menu_navigation_keyboard_builder(
@@ -42,14 +45,20 @@ async def notify_about_new_projects(user_id: int, categories_ids: int | list[int
     )
     if len(rendered) < 4096:
         await main_bot.send_message(
-            user_id,
+            chat_id,
             rendered,
             reply_markup=builder.as_markup(),
+            disable_web_page_preview=True,
         )
     else:
         for item in rendered.split("<b>"):
             await asyncio.sleep(2)
-            await main_bot.send_message(user_id, item, reply_markup=builder.as_markup())
+            await main_bot.send_message(
+                chat_id,
+                item,
+                reply_markup=builder.as_markup(),
+                disable_web_page_preview=True,
+            )
 
 
 if __name__ == "__main__":

@@ -183,7 +183,7 @@ async def scheduler_add_job_process(message: Message, state: FSMContext):
         message_answer = await message.answer(
             f"Error <code>{html.escape(e.args[0])}</code>. Try again"
         )
-        await asyncio.sleep(2)
+        await asyncio.sleep(3)
         for id in range(message_answer.message_id - 1, message_answer.message_id + 1):
             await main_bot.delete_message(message.from_user.id, id)
         return None
@@ -203,10 +203,7 @@ async def scheduler_add_job_process(message: Message, state: FSMContext):
         job = async_scheduler.add_job(
             notify_about_new_projects,
             cron_trigger,
-            args=(
-                message.from_user.id,
-                [category_id],
-            ),
+            args=(message.from_user.id, [category_id], job_id),
             id=job_id,
             name=actions[0].name,
         )

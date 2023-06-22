@@ -2,6 +2,7 @@
 
 Id — <code>{{ job.id }}</code>
 Name — <em>{{ job.name }}</em>
-Func — {{ job.func.__name__ if job.func is not none else 'NONE' }}
+Func — {{ job.func.__name__ }}
+Trigger — {{ job.trigger }}
 Next run time — <b>{{ job.next_run_time }}</b>
 {% endfor %}

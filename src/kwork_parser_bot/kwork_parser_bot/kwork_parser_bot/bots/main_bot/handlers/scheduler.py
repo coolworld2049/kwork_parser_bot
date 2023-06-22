@@ -85,23 +85,6 @@ async def scheduler_add_job_trigger_process(
 @router.message(SchedulerState.add_job)
 async def scheduler_add_job_process(message: Message, state: FSMContext):
     state_data = await state.get_data()
-
-    async def process_input():
-        try:
-            CronTrigger.from_crontab(message.text)
-        except ValueError as e:
-            message_answer = await message.answer(
-                f"Error <code>{html.escape(e.args[0])}</code>. Try again"
-            )
-            await asyncio.sleep(3)
-            for id in range(
-                message_answer.message_id - 1, message_answer.message_id + 1
-            ):
-                await main_bot.delete_message(message.from_user.id, id)
-            return None
-
-    await process_input()
-
     sched_jobs: list[SchedJob] = [SchedJob(**x) for x in state_data.get("sched_jobs")]
     for sched_job in sched_jobs:
         try:
@@ -125,8 +108,6 @@ async def scheduler_add_job_process(message: Message, state: FSMContext):
             if get_app_settings().LOGGING_LEVEL == "DEBUG":
                 raise e
             return None
-        else:
-            await state.clear()
 
 
 @router.callback_query(SchedulerCallback.filter(F.action == "rm"))

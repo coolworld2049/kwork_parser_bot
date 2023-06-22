@@ -23,9 +23,7 @@ async def cached_categories(
     categories: list[Category] | bytes = await redis.get(key)
     if not categories:
         categories: list[Category] = await kwork_api.get_categories()
-        await redis.set(
-            key, json.dumps([x.json() for x in categories]), ex=ex
-        )
+        await redis.set(key, json.dumps([x.json() for x in categories]), ex=ex)
         return categories
     else:
         expire = await redis.expire(key, ex)

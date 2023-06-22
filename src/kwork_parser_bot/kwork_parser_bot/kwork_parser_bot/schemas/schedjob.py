@@ -17,8 +17,8 @@ class SchedJobBase(BaseModel):
     coalesce: bool = None
     max_instances: int = None
     next_run_time: datetime = None
-    jobstore: str = 'default'
-    executor: str = 'default'
+    jobstore: str = "default"
+    executor: str = "default"
     replace_existing: bool = False
 
     class Config:
@@ -30,4 +30,5 @@ class SchedJob(SchedJobBase):
     callback: SchedulerCallback
 
     @property
-    def id(self): return self.callback.pack()
+    def id(self):
+        return self.callback.pack()

@@ -1,6 +1,7 @@
 import asyncio
 
 from kwork.types import Project
+from loguru import logger
 
 from kwork_parser_bot.bots.dispatcher import redis
 from kwork_parser_bot.bots.main_bot.callbacks import (
@@ -27,6 +28,7 @@ async def notify_about_new_projects(
     categories_ids: int | list[int],
     job_id: str = None,
 ):
+    logger.debug(f"func run:{__file__}")
     if not user_id:
         user_id = chat_id
     categories = await cached_categories(redis, kwork_api=kwork_api)
@@ -50,26 +52,32 @@ async def notify_about_new_projects(
     builder = menu_navigation_keyboard_builder(
         menu_callback=MenuCallback(name="start").pack()
     )
+    send_messages = []
     if len(rendered) < 4096:
-        await main_bot.send_message(
+        send_message = await main_bot.send_message(
             chat_id,
             rendered,
             reply_markup=builder.as_markup(),
             disable_web_page_preview=True,
         )
+        send_messages.append(send_message)
     else:
         for item in rendered.split("<b>"):
             await asyncio.sleep(2)
-            await main_bot.send_message(
+            send_message = await main_bot.send_message(
                 chat_id,
                 item,
                 reply_markup=builder.as_markup(),
                 disable_web_page_preview=True,
             )
+            send_messages.append(send_message)
+    logger.debug(f"func completed:{__file__}, send_messages:{[x.message_id for x in send_messages]}")
 
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
-        notify_about_new_projects(1070277776, 1070277776, [11], "sched:job:add:1070277776:11:41")
+        notify_about_new_projects(
+            1070277776, 1070277776, [11], "sched:job:add:1070277776:11:41"
+        )
     )

@@ -16,10 +16,6 @@ def kwork_menu_keyboard_builder():
             text="🔎 Categories",
             callback_data=MenuCallback(name="category").pack(),
         ),
-        InlineKeyboardButton(
-            text="👨‍💻 Account",
-            callback_data=MenuCallback(name="account").pack(),
-        ),
     )
     return builder
 
@@ -59,7 +55,7 @@ def category_keyboard_builder(
     return builder
 
 
-def sched_job_keyboard_builder(
+def sched_jobs_keyboard_builder(
     sched_jobs: list[SchedJob],
 ):
     builder = InlineKeyboardBuilder()

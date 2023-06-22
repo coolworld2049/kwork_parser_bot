@@ -1,6 +1,4 @@
-New projects found by job
-Id — <code>{{ job.id }}</code>
-Name — <code>{{ job.name }}</code>
+New projects
 {% for project in projects %}
 {{loop.index}}. <a href="{{ project.project_url }}">{{project.title}}</a>
 Price — {{project.price}}

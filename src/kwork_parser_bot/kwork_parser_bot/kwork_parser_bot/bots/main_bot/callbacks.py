@@ -18,7 +18,7 @@ class ConfirmCallback(CallbackData, prefix="confirm"):
     answer: str
 
 
-class SchedulerCallback(CallbackData, prefix="sched"):
+class SchedulerCallback(CallbackData, prefix="scheduler"):
     name: str | None
     action: str | None
     user_id: int | None

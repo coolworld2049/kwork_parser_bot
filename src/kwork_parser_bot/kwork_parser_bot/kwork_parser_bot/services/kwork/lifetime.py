@@ -1,16 +1,16 @@
-from aiogram import Bot
-from kwork import Kwork
+from contextlib import asynccontextmanager
 
-from kwork_parser_bot.core.config import get_app_settings
+from loguru import logger
 
-
-def init_kwork_api(bot: Bot):
-    bot.kwork_api = Kwork(
-        login=get_app_settings().KWORK_LOGIN,
-        password=get_app_settings().KWORK_PASSWORD,
-        phone_last=get_app_settings().KWORK_PHONE_LAST,
-    )
+from kwork_parser_bot.services.kwork.base_class import KworkApi, KworkCreds
 
 
-async def shutdown_kwork_api(bot: Bot):
-    await bot.kwork_api.close()
+@asynccontextmanager
+async def get_user_kwork_api(kwork_creds: KworkCreds):
+    kwork_api = KworkApi(kwork_creds)
+    try:
+        yield kwork_api
+    except Exception as e:
+        logger.error(e.args)
+    finally:
+        await kwork_api.close()

@@ -7,10 +7,10 @@ loguru
 jinja2
 stringcase
 kwork
-sqlalchemy
 apscheduler
+sqlalchemy
 sqlalchemy-mixins
-pandas
+pydantic-sqlalchemy
 cron-validator
 asyncpg
 psycopg2

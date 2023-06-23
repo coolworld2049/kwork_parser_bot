@@ -2,8 +2,8 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from loguru import logger
+from redis.asyncio.connection import ConnectionPool
 
-from kwork_parser_bot.services.redis.main import redis
 from kwork_parser_bot.bots.main_bot.callbacks import (
     KworkCategoryCallback,
     SchedulerCallback,
@@ -21,20 +21,16 @@ from kwork_parser_bot.bots.main_bot.keyboards.scheduler import (
 )
 from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.bots.main_bot.states import SchedulerState
-from kwork_parser_bot.services.kwork.main import (
-    cached_categories,
-    get_parent_category,
-    get_category,
-    kwork_api,
-)
 from kwork_parser_bot.core.config import get_app_settings
 from kwork_parser_bot.schemas import SchedJob
+from kwork_parser_bot.services.kwork.base_class import KworkApi
+from kwork_parser_bot.services.scheduler.base_class import Scheduler
 
 router = Router(name=__file__)
 
 
 @router.callback_query(MenuCallback.filter(F.name == "kwork"))
-async def kwork_menu(query: CallbackQuery, state: FSMContext):
+async def kwork_menu(query: CallbackQuery, state: FSMContext, kwork_api: KworkApi):
     sched_jobs = [
         SchedJob(
             text="🔔 Receive account notifications",
@@ -46,6 +42,7 @@ async def kwork_menu(query: CallbackQuery, state: FSMContext):
             name="account notifications",
             func=f"{get_app_settings().SCHED_JOBS_MODULE}:notify_about_kwork_notifications",
             args=(
+                kwork_api.kwork_creds_dict(),
                 query.from_user.id,
                 query.from_user.id,
             ),
@@ -69,12 +66,16 @@ async def kwork_menu(query: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(MenuCallback.filter(F.name == "category"))
-async def category(
-    query: CallbackQuery, callback_data: KworkCategoryCallback, state: FSMContext
+async def category_menu(
+    query: CallbackQuery,
+    callback_data: KworkCategoryCallback,
+    state: FSMContext,
+    kwork_api: KworkApi,
+    redis_pool: ConnectionPool
 ):
     await state.clear()
-    categories = await cached_categories(redis, kwork_api=kwork_api)
-    builder = category_keyboard_builder(categories, callback_name="subcategory")
+    category = await kwork_api.cached_category(redis_pool)
+    builder = category_keyboard_builder(category, callback_name="subcategory")
     builder = menu_navigation_keyboard_builder(
         builder,
         back_callback=MenuCallback(name="kwork").pack(),
@@ -90,11 +91,15 @@ async def category(
 
 @router.callback_query(KworkCategoryCallback.filter(F.name == "subcategory"))
 async def subcategory(
-    query: CallbackQuery, callback_data: KworkCategoryCallback, state: FSMContext
+    query: CallbackQuery,
+    callback_data: KworkCategoryCallback,
+    state: FSMContext,
+    kwork_api: KworkApi,
+    redis_pool: ConnectionPool
 ):
-    categories = await cached_categories(redis, kwork_api=kwork_api)
+    category = await kwork_api.cached_category(redis_pool)
     builder = category_keyboard_builder(
-        categories, callback_data.category_id, callback_name="sched-job"
+        category, callback_data.category_id, callback_name="scheduler-job"
     )
     builder = menu_navigation_keyboard_builder(
         builder,
@@ -110,9 +115,14 @@ async def subcategory(
     await query.message.delete()
 
 
-@router.callback_query(KworkCategoryCallback.filter(F.name == "sched-job"))
+@router.callback_query(KworkCategoryCallback.filter(F.name == "scheduler-job"))
 async def subcategory_sched_job(
-    query: CallbackQuery, callback_data: KworkCategoryCallback, state: FSMContext
+    query: CallbackQuery,
+    callback_data: KworkCategoryCallback,
+    state: FSMContext,
+    kwork_api: KworkApi,
+    scheduler: Scheduler,
+    redis_pool: ConnectionPool
 ):
     state_data = await state.get_data()
     category_id: int = state_data.get("category_id")
@@ -120,9 +130,9 @@ async def subcategory_sched_job(
     if not all([category_id, subcategory_id]):
         logger.debug(all([category_id, subcategory_id]))
         return None
-    categories = await cached_categories(redis, kwork_api=kwork_api)
-    parent_category = get_parent_category(categories, category_id)
-    category = get_category(categories, parent_category.id, subcategory_id)
+    category = await kwork_api.cached_category(redis_pool)
+    parent_category = kwork_api.get_parent_category(category, category_id)
+    category = kwork_api.get_category(category, parent_category.id, subcategory_id)
 
     notify_about_new_projects_callback = SchedulerCallback(
         name="job",
@@ -138,6 +148,7 @@ async def subcategory_sched_job(
             name=f"notifications by {parent_category.name}-{category.name}",
             func=f"{get_app_settings().SCHED_JOBS_MODULE}:notify_about_new_projects",
             args=(
+                kwork_api.kwork_creds_dict(),
                 query.from_user.id,
                 query.from_user.id,
                 [category_id],

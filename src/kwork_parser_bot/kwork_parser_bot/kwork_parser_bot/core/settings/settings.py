@@ -13,11 +13,12 @@ project_path = pathlib.Path(__file__).parent.parent.parent
 
 class SchedulerSettings(BaseAppSettings):
     SCHED_JOBS_MODULE = (
-        f"{'.'.join(str(__package__).split('.')[:-2])}.services.sched.jobs"
+        f"{'.'.join(str(__package__).split('.')[:-2])}.services.scheduler.jobs"
     )
 
 
 class MainBotSettings(SchedulerSettings):
+    BOT_OWNER_ID: int = 1070277776
     BOT_TOKEN: str
     BOT_COMMANDS: list[BotCommand] = [
         BotCommand(command="/start", description="start the main_bot"),

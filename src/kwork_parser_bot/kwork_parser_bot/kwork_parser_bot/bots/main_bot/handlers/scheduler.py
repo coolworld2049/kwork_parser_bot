@@ -23,22 +23,21 @@ from kwork_parser_bot.bots.main_bot.keyboards.scheduler import (
     scheduler_menu_keyboard_builder,
 )
 from kwork_parser_bot.bots.main_bot.loader import main_bot
-from kwork_parser_bot.services.sched.main import (
-    async_scheduler,
-    get_user_job,
-    remove_job,
-)
 from kwork_parser_bot.bots.main_bot.states import SchedulerState
 from kwork_parser_bot.core.config import get_app_settings
 from kwork_parser_bot.schemas import SchedJob
+from kwork_parser_bot.services.kwork.base_class import KworkApi
+from kwork_parser_bot.services.scheduler.base_class import Scheduler
 from kwork_parser_bot.template_engine import render_template
 
 router = Router(name=__file__)
 
 
-@router.callback_query(MenuCallback.filter(F.name == "sched"))
-async def scheduler_menu(query: CallbackQuery, state: FSMContext):
-    jobs = get_user_job(query.from_user.id)
+@router.callback_query(MenuCallback.filter(F.name == "scheduler"))
+async def scheduler_menu(
+    query: CallbackQuery, state: FSMContext, kwork_api: KworkApi, scheduler: Scheduler
+):
+    jobs = scheduler.get_user_job(query.from_user.id)
     builder = scheduler_menu_keyboard_builder()
     builder = menu_navigation_keyboard_builder(
         menu_callback=MenuCallback(name="start").pack(),
@@ -59,7 +58,7 @@ async def scheduler_menu(query: CallbackQuery, state: FSMContext):
             await query.message.delete()
     else:
         await query.answer("No Job found")
-        await start_callback(query, state)
+        await start_callback(query, state, kwork_api)
 
 
 @router.callback_query(
@@ -71,7 +70,7 @@ async def scheduler_add_job_trigger_process(
 ):
     state_data = await state.get_data()
     builder = menu_navigation_keyboard_builder(
-        back_callback=KworkCategoryCallback(name="sched-job", **state_data).pack(),
+        back_callback=KworkCategoryCallback(name="scheduler-job", **state_data).pack(),
         menu_callback=MenuCallback(name="start").pack(),
     )
     message = await main_bot.send_message(
@@ -87,7 +86,9 @@ async def scheduler_add_job_trigger_process(
 
 
 @router.message(SchedulerState.add_job)
-async def scheduler_add_job_process(message: Message, state: FSMContext):
+async def scheduler_add_job_process(
+    message: Message, state: FSMContext, kwork_api: KworkApi, scheduler: Scheduler
+):
     state_data = await state.get_data()
     sched_jobs: list[SchedJob] = [SchedJob(**x) for x in state_data.get("sched_jobs")]
     for sched_job in sched_jobs:
@@ -99,8 +100,8 @@ async def scheduler_add_job_process(message: Message, state: FSMContext):
             sched_job.trigger = cron_trigger
             sched_job_data: dict = sched_job.dict(exclude_none=True)
             sched_job_data.update({"id": f"{sched_job.id}:{sched_job.name}"})
-            async_scheduler.add_job(**sched_job_data)
-            await start_message(message, state)
+            scheduler.add_job(**sched_job_data)
+            await start_message(message, state, kwork_api)
         except Exception as e:
             message_answer = await message.answer(
                 f"Error <code>{html.escape(e.args[0])}</code>. Try again"
@@ -140,14 +141,18 @@ async def scheduler_remove_job_confirm(message: Message, state: FSMContext):
     ConfirmCallback.filter(F.name == "rmjob"), SchedulerState.remove_job
 )
 async def scheduler_remove_job(
-    query: CallbackQuery, callback_data: ConfirmCallback, state: FSMContext
+    query: CallbackQuery,
+    callback_data: ConfirmCallback,
+    state: FSMContext,
+    kwork_api: KworkApi,
+    scheduler: Scheduler,
 ):
     state_data = await state.get_data()
     job_id: str | list[str] = state_data.get("job_id")
     if callback_data.answer == "yes":
-        results = remove_job(query.from_user.id, job_id)
+        results = scheduler.remove_user_job(query.from_user.id, job_id)
         await query.answer("\n".join(results))
     elif callback_data.answer == "no":
         await query.answer("Deletion canceled")
     await state.clear()
-    await scheduler_menu(query, state)
+    await scheduler_menu(query, state, kwork_api, scheduler)

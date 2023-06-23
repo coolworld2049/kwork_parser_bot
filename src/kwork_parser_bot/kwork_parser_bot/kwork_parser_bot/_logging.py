@@ -81,21 +81,9 @@ def configure_logging() -> None:  # pragma: no cover
     # set logs output, level and format
     logger.remove()
     logger.add(
-        get_app_settings().LOG_FILE_PATH + "/error.log",
-        serialize=True,
-        level=logging.WARNING,
-        enqueue=True,
-        backtrace=True,
-        diagnose=True,
-        encoding="UTF-8",
-        rotation="128 MB",
-        retention="14 days",
-        compression="zip",
-    )
-    logger.add(
         get_app_settings().LOG_FILE_PATH + "/access.log",
         serialize=False,
-        level=logging.INFO,
+        level=get_app_settings().LOGGING_LEVEL,
         enqueue=True,
         backtrace=True,
         diagnose=True,

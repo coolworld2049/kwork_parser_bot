@@ -16,7 +16,7 @@ def menu_keyboard_builder():
         InlineKeyboardButton(
             text="📅 Scheduler",
             callback_data=MenuCallback(
-                name="sched",
+                name="scheduler",
             ).pack(),
         ),
         InlineKeyboardButton(

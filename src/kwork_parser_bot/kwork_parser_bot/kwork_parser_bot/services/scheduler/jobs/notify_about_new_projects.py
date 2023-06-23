@@ -2,12 +2,6 @@ import asyncio
 
 from kwork.types import Project
 
-from kwork_parser_bot.bots.main_bot.callbacks import (
-    MenuCallback,
-)
-from kwork_parser_bot.bots.main_bot.keyboards.menu import (
-    menu_navigation_keyboard_builder,
-)
 from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.core.config import get_app_settings
 from kwork_parser_bot.schemas.project import ProjectExtended
@@ -47,16 +41,12 @@ async def notify_about_new_projects(
             job=job,
             projects=new_projects,
         )
-    builder = menu_navigation_keyboard_builder(
-        menu_callback=MenuCallback(name="start").pack()
-    )
     send_messages = []
     if len(rendered) < 4096:
         if rendered:
             send_message = await main_bot.send_message(
                 chat_id,
                 rendered,
-                reply_markup=builder.as_markup(),
                 disable_web_page_preview=True,
             )
             send_messages.append(send_message)
@@ -66,7 +56,6 @@ async def notify_about_new_projects(
                 send_message = await main_bot.send_message(
                     chat_id,
                     item,
-                    reply_markup=builder.as_markup(),
                     disable_web_page_preview=True,
                 )
                 send_messages.append(send_message)

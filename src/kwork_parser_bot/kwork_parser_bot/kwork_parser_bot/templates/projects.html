@@ -1,11 +1,10 @@
-New projects found at job
-<code>{{ job.id }}</code>
-notifications: <code>{{ job.name }}</code>
+🔔 New projects found at
+Job id — <code>{{ job.id }}</code>
+Category — <b><code>{{ job.name }}</code></b>
 {% for project in projects %}
 {{loop.index}}. <a href="{{ project.project_url }}">{{project.title}}</a>
 Price — {{project.price}}
 Offers — {{project.offers}}
 Time left — {{project.time_left_time}}
-Category — {{project.parent_category_id}}, {{project.category_id}}
 Date confirm — {{project.date_confirm_datetime}}
 {% endfor %}

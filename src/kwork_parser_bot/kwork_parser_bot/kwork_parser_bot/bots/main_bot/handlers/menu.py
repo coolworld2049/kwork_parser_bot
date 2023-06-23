@@ -45,7 +45,11 @@ async def start_message(message: Message, state: FSMContext, kwork_api: KworkApi
 
 
 @router.callback_query(MenuCallback.filter(F.name == "start"))
-async def start_callback(query: CallbackQuery, state: FSMContext, kwork_api: KworkApi):
+async def start_callback(
+    query: CallbackQuery,
+    state: FSMContext,
+    kwork_api: KworkApi,
+):
     with suppress(TelegramBadRequest):
         await query.message.delete()
     await start_cmd(query.from_user, state, query.message.message_id, kwork_api)

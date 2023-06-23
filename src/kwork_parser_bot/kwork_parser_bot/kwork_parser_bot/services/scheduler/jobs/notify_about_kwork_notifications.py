@@ -19,7 +19,7 @@ async def notify_about_kwork_notifications(
         send_message = await main_bot.send_message(
             chat_id,
             render_template(
-                "notification.html",
+                "account_notifications.html",
                 data=notifications.__str__(),
             ),
         )

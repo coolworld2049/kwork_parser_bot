@@ -117,7 +117,7 @@ async def scheduler_add_job_process(
 
 @router.callback_query(SchedulerCallback.filter(F.action == "rm"))
 async def scheduler_remove_job_process(query: CallbackQuery, state: FSMContext):
-    await query.answer(f"Enter a job ID e.g `aaa` or `aaa,bbb,ccc`")
+    await query.answer(f"Enter a job ID e.g `aaa` or `aaa,bbb,ccc`", show_alert=True)
     await state.set_state(SchedulerState.remove_job)
     await state.update_data(prev_message_id=query.message.message_id)
 
@@ -151,7 +151,7 @@ async def scheduler_remove_job(
     job_id: str | list[str] = state_data.get("job_id")
     if callback_data.answer == "yes":
         results = scheduler.remove_user_job(query.from_user.id, job_id)
-        await query.answer("\n".join(results))
+        await query.answer("\n".join(results), show_alert=True)
     elif callback_data.answer == "no":
         await query.answer("Deletion canceled")
     await state.clear()

@@ -1,15 +1,10 @@
-import asyncio
-
 from aiogram import Dispatcher
 from loguru import logger
 
-import kwork_parser_bot.bots.main_bot.handlers.menu
 from kwork_parser_bot.bots.dispatcher import dp
 from kwork_parser_bot.bots.main_bot.handlers import (
-    help,
-    start,
     kwork,
-    scheduler,
+    scheduler, menu,
 )
 from kwork_parser_bot.bots.main_bot.loader import main_bot, async_scheduler
 from kwork_parser_bot.bots.main_bot.thirdparty.kwork.main import kwork_api
@@ -23,21 +18,17 @@ async def startup(dp: Dispatcher) -> None:
         await main_bot.set_my_commands(commands=get_app_settings().BOT_COMMANDS)
     await main_bot.delete_webhook(drop_pending_updates=True)
     dp.include_routers(
-        kwork_parser_bot.bots.main_bot.handlers.menu.router,
-        help.router,
+        menu.router,
         kwork.router,
         scheduler.router,
     )
     async_scheduler.start()
-    logger.info("Start scheduler!")
-    logger.info("Start polling!")
 
 
 async def shutdown(dp: Dispatcher) -> None:
     async_scheduler.shutdown(wait=True)
     await dp.storage.close()
     await kwork_api.close()
-    logger.info("Stop polling!")
 
 
 async def run_main_bot():
@@ -48,11 +39,3 @@ async def run_main_bot():
         logger.warning(e.args)
     else:
         await shutdown(dp)
-
-
-if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    try:
-        loop.run_until_complete(run_main_bot())
-    except Exception as e:
-        logger.warning(e.args)

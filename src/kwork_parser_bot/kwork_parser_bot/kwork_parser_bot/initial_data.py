@@ -2,12 +2,12 @@ import asyncio
 
 from loguru import logger
 
-from kwork_parser_bot.db.init_db import init_db
+from kwork_parser_bot.db.utils import create_database
 
 
 async def main() -> None:
     logger.info("Creating initial data")
-    await init_db()
+    await create_database()
     logger.info("Initial data created")
 
 

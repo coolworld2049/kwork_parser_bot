@@ -1,18 +1,25 @@
 import logging
 import os
 import pathlib
-import sys
 from typing import Optional
 
+import pydantic
 from aiogram.types import BotCommand
-from loguru import logger
+from pydantic import PostgresDsn
+from yarl import URL
 
 from kwork_parser_bot.core.settings.base import BaseAppSettings
 
 project_path = pathlib.Path(__file__).parent.parent.parent
 
 
-class MainBotSettings(BaseAppSettings):
+class SettingsBase(BaseAppSettings):
+    TIMEZONE: Optional[str] = "Europe/Moscow"
+    LOG_FILE_PATH: Optional[str] = f"{project_path}/.logs"
+    LOGGING_LEVEL: Optional[str] = logging.getLevelName(os.getenv("LOGGING_LEVEL", "INFO"))
+
+
+class MainBotSettings(SettingsBase):
     BOT_TOKEN: str
     BOT_COMMANDS: list[BotCommand] = [
         BotCommand(command="/start", description="start the main_bot"),
@@ -20,7 +27,7 @@ class MainBotSettings(BaseAppSettings):
     BOT_SUPPORT: Optional[str] = "https://t.me/kworkAdsParserSupport"
 
 
-class RedisSettings(BaseAppSettings):
+class RedisSettings(SettingsBase):
     USE_REDIS: Optional[bool] = True
     REDIS_MASTER_HOST: str
     REDIS_MASTER_PORT_NUMBER: int
@@ -30,59 +37,41 @@ class RedisSettings(BaseAppSettings):
     REDIS_MAX_CONNECTIONS: Optional[int] = 1000
 
 
-# class PostgresSettings(BaseAppSettings):
-#     POSTGRESQL_USERNAME: str
-#     POSTGRESQL_PASSWORD: str
-#     POSTGRESQL_DATABASE: str
-#     POSTGRESQL_TIMEZONE: Optional[str]
-#     POSTGRESQL_MASTER_HOST: str
-#     POSTGRESQL_MASTER_PORT_NUMBER: Optional[int] = 5432
-#
-#
-# class PgbouncerSettings(PostgresSettings):
-#     PGBOUNCER_HOST: str
-#     PGBOUNCER_PORT: Optional[int] = 6432
-#     PGBOUNCER_DATABASE: str
-#
-#     @property
-#     def pgbouncer_url(self):
-#         return (
-#             f"postgresql://{self.POSTGRESQL_USERNAME}:{self.POSTGRESQL_PASSWORD}"
-#             f"@{self.PGBOUNCER_HOST}:{self.PGBOUNCER_PORT}/{self.POSTGRESQL_DATABASE}"
-#         )
+class PostgresSettings(SettingsBase):
+    POSTGRESQL_USERNAME: str
+    POSTGRESQL_PASSWORD: str
+    POSTGRESQL_DATABASE: str
+    POSTGRESQL_MASTER_HOST: str
+    POSTGRESQL_MASTER_PORT_NUMBER: Optional[int] = 5432
+
+    @property
+    def postgresql_timezone(self):
+        return self.TIMEZONE
 
 
-class Settings(MainBotSettings, RedisSettings):
+class PgbouncerSettings(PostgresSettings):
+    PGBOUNCER_HOST: str
+    PGBOUNCER_PORT: Optional[int] = 6432
+    PGBOUNCER_DATABASE: str
+
+    @property
+    def pgbouncer_url(self):
+        return PostgresDsn.build(
+            scheme="postgresql",
+            host=self.PGBOUNCER_HOST,
+            port=self.PGBOUNCER_PORT.__str__(),
+            user=self.POSTGRESQL_USERNAME,
+            password=self.POSTGRESQL_PASSWORD,
+            path=f"/{self.POSTGRESQL_DATABASE}",
+        )
+
+
+class Settings(MainBotSettings, RedisSettings, PgbouncerSettings):
     PROJECT_NAME: Optional[str] = pathlib.Path(__file__).parent
     STAGE: str
     KWORK_LOGIN: Optional[str]
     KWORK_PASSWORD: Optional[str]
     KWORK_PHONE_LAST: Optional[str]
-    TIMEZONE: Optional[str] = "Europe/Moscow"
-    LOG_FILE_PATH: Optional[str] = f"{project_path}/.logs/access.log"
-    LOGGING_LEVEL: str = logging.getLevelName(os.getenv("LOGGING_LEVEL", "INFO"))
 
     class Config:
         case_sensitive = True
-
-    def configure_loguru(self):
-        logger.configure(
-            handlers=[
-                {
-                    "sink": sys.stderr,
-                    "level": self.LOGGING_LEVEL,
-                },
-            ],
-        )
-        logger.add(
-            self.LOG_FILE_PATH,
-            serialize=False,
-            level=self.LOGGING_LEVEL,
-            enqueue=True,
-            backtrace=True,
-            diagnose=True,
-            encoding="UTF-8",
-            rotation="128 MB",
-            retention="14 days",
-            compression="zip",
-        )

@@ -12,7 +12,7 @@ from kwork_parser_bot.core.settings.base import BaseAppSettings
 project_path = pathlib.Path(__file__).parent.parent.parent
 
 
-class BotSettings(BaseAppSettings):
+class MainBotSettings(BaseAppSettings):
     BOT_TOKEN: str
     BOT_COMMANDS: list[BotCommand] = [
         BotCommand(command="/start", description="start the main_bot"),
@@ -30,7 +30,29 @@ class RedisSettings(BaseAppSettings):
     REDIS_MAX_CONNECTIONS: Optional[int] = 1000
 
 
-class Settings(BotSettings, RedisSettings):
+# class PostgresSettings(BaseAppSettings):
+#     POSTGRESQL_USERNAME: str
+#     POSTGRESQL_PASSWORD: str
+#     POSTGRESQL_DATABASE: str
+#     POSTGRESQL_TIMEZONE: Optional[str]
+#     POSTGRESQL_MASTER_HOST: str
+#     POSTGRESQL_MASTER_PORT_NUMBER: Optional[int] = 5432
+#
+#
+# class PgbouncerSettings(PostgresSettings):
+#     PGBOUNCER_HOST: str
+#     PGBOUNCER_PORT: Optional[int] = 6432
+#     PGBOUNCER_DATABASE: str
+#
+#     @property
+#     def pgbouncer_url(self):
+#         return (
+#             f"postgresql://{self.POSTGRESQL_USERNAME}:{self.POSTGRESQL_PASSWORD}"
+#             f"@{self.PGBOUNCER_HOST}:{self.PGBOUNCER_PORT}/{self.POSTGRESQL_DATABASE}"
+#         )
+
+
+class Settings(MainBotSettings, RedisSettings):
     PROJECT_NAME: Optional[str] = pathlib.Path(__file__).parent
     STAGE: str
     KWORK_LOGIN: Optional[str]

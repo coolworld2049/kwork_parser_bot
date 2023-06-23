@@ -1,7 +1,7 @@
 from aiogram.filters.callback_data import CallbackData
 
 
-class CategoryCallback(CallbackData, prefix="cat"):
+class KworkCategoryCallback(CallbackData, prefix="kwcat"):
     name: str
     category_id: int | None
     subcategory_id: int | None

@@ -5,7 +5,7 @@ from loguru import logger
 
 from kwork_parser_bot.bots.dispatcher import redis
 from kwork_parser_bot.bots.main_bot.callbacks import (
-    CategoryCallback,
+    KworkCategoryCallback,
     SchedulerCallback,
     MenuCallback,
 )
@@ -51,9 +51,9 @@ async def kwork_menu(query: CallbackQuery, state: FSMContext):
         )
     ]
     builder = kwork_menu_keyboard_builder()
-    # builder_sched_jobs = sched_jobs_keyboard_builder(sched_jobs)
-    # builder.add(*list(builder_sched_jobs.buttons))
-    # builder.adjust(2)
+    builder_sched_jobs = sched_jobs_keyboard_builder(sched_jobs)
+    builder.add(*list(builder_sched_jobs.buttons))
+    builder.adjust(1)
     builder = menu_navigation_keyboard_builder(
         builder, menu_callback=MenuCallback(name="start").pack()
     )
@@ -69,7 +69,7 @@ async def kwork_menu(query: CallbackQuery, state: FSMContext):
 
 @router.callback_query(MenuCallback.filter(F.name == "category"))
 async def category(
-    query: CallbackQuery, callback_data: CategoryCallback, state: FSMContext
+    query: CallbackQuery, callback_data: KworkCategoryCallback, state: FSMContext
 ):
     await state.clear()
     categories = await cached_categories(redis, kwork_api=kwork_api)
@@ -87,9 +87,9 @@ async def category(
     await query.message.delete()
 
 
-@router.callback_query(CategoryCallback.filter(F.name == "subcategory"))
+@router.callback_query(KworkCategoryCallback.filter(F.name == "subcategory"))
 async def subcategory(
-    query: CallbackQuery, callback_data: CategoryCallback, state: FSMContext
+    query: CallbackQuery, callback_data: KworkCategoryCallback, state: FSMContext
 ):
     categories = await cached_categories(redis, kwork_api=kwork_api)
     builder = category_keyboard_builder(
@@ -109,9 +109,9 @@ async def subcategory(
     await query.message.delete()
 
 
-@router.callback_query(CategoryCallback.filter(F.name == "sched-job"))
+@router.callback_query(KworkCategoryCallback.filter(F.name == "sched-job"))
 async def subcategory_sched_job(
-    query: CallbackQuery, callback_data: CategoryCallback, state: FSMContext
+    query: CallbackQuery, callback_data: KworkCategoryCallback, state: FSMContext
 ):
     state_data = await state.get_data()
     category_id: int = state_data.get("category_id")
@@ -147,7 +147,7 @@ async def subcategory_sched_job(
     builder = sched_jobs_keyboard_builder(sched_jobs)
     builder = menu_navigation_keyboard_builder(
         builder,
-        back_callback=CategoryCallback(
+        back_callback=KworkCategoryCallback(
             name="subcategory",
             category_id=category_id,
             subcategory_id=subcategory_id,

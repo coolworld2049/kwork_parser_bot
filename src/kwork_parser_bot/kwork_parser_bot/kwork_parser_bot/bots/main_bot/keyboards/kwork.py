@@ -5,7 +5,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from kwork.types import Category
 from kwork.types.category import Subcategory
 
-from kwork_parser_bot.bots.main_bot.callbacks import CategoryCallback, MenuCallback
+from kwork_parser_bot.bots.main_bot.callbacks import KworkCategoryCallback, MenuCallback
 from kwork_parser_bot.schemas import SchedJob
 
 
@@ -46,12 +46,12 @@ def category_keyboard_builder(
         builder.add(
             InlineKeyboardButton(
                 text=item.name,
-                callback_data=CategoryCallback(
+                callback_data=KworkCategoryCallback(
                     name=callback_name, **define_type_category(categories, item.id)
                 ).pack(),
             )
         )
-    builder.adjust(2)
+    builder.adjust(1)
     return builder
 
 

@@ -12,7 +12,7 @@ from kwork_parser_bot.bots.main_bot.callbacks import (
     SchedulerCallback,
     MenuCallback,
     ConfirmCallback,
-    CategoryCallback,
+    KworkCategoryCallback,
 )
 from kwork_parser_bot.bots.main_bot.handlers.start import start_callback, start_message
 from kwork_parser_bot.bots.main_bot.keyboards.confirm import confirm_keyboard_builder
@@ -67,7 +67,7 @@ async def scheduler_add_job_trigger_process(
 ):
     state_data = await state.get_data()
     builder = menu_navigation_keyboard_builder(
-        back_callback=CategoryCallback(name="sched-job", **state_data).pack(),
+        back_callback=KworkCategoryCallback(name="sched-job", **state_data).pack(),
         menu_callback=MenuCallback(name="start").pack(),
     )
     message = await main_bot.send_message(

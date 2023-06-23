@@ -5,7 +5,7 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from kwork_parser_bot.bots.main_bot.callbacks import MenuCallback, CategoryCallback
+from kwork_parser_bot.bots.main_bot.callbacks import MenuCallback, KworkCategoryCallback
 from kwork_parser_bot.bots.main_bot.keyboards.menu import (
     menu_navigation_keyboard_builder,
 )
@@ -18,7 +18,7 @@ router = Router(name=__file__)
 
 @router.callback_query(MenuCallback.filter(F.name == "help"))
 async def help_callback(
-    query: CallbackQuery, callback_data: CategoryCallback, state: FSMContext
+    query: CallbackQuery, callback_data: KworkCategoryCallback, state: FSMContext
 ):
     with suppress(TelegramBadRequest):
         await query.message.delete()

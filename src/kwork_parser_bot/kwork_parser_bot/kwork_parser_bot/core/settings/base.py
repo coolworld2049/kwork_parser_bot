@@ -11,4 +11,3 @@ class BaseAppSettings(BaseSettings):
     load_dotenv(find_dotenv(f"{project_path}/.env"))
     stage_dotenv = find_dotenv(f'{project_path}/.env.{os.getenv("STAGE", "dev")}')
     load_dotenv(stage_dotenv, override=True) if stage_dotenv else None
-    os.environ.update({"PYTHONPATH": f"{os.environ.get('PYTHONPATH')}:/project_path"})

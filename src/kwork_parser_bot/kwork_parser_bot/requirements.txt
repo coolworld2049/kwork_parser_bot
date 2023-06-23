@@ -14,3 +14,4 @@ pydantic-sqlalchemy
 cron-validator
 asyncpg
 psycopg2
+py-bcrypt

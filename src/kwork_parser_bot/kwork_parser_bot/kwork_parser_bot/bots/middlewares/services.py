@@ -27,7 +27,7 @@ class ServicesMiddleware(BaseMiddleware):
             kwork_creds = KworkCreds(
                 login=get_app_settings().KWORK_LOGIN,
                 password=get_app_settings().KWORK_PASSWORD,
-                phone_last=get_app_settings().KWORK_PHONE_LAST,
+                phone=get_app_settings().KWORK_PHONE,
             )
         else:
             kwork_creds = None

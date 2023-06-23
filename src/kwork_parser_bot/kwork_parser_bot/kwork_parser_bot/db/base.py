@@ -1,15 +1,16 @@
 from typing import Any
 
 import stringcase
-from sqlalchemy.orm import DeclarativeBase, declared_attr
+from sqlalchemy.orm import declared_attr
+from sqlalchemy_mixins.serialize import SerializeMixin
 
 from kwork_parser_bot.db.meta import meta
 
 
-class Base(DeclarativeBase):
+class Base(SerializeMixin):
     __abstract__ = True
-    id: Any
     __name__: str
+    id: Any
     metadata = meta
 
     @declared_attr

@@ -3,9 +3,9 @@ from loguru import logger
 
 from kwork_parser_bot.bots.dispatcher import dp
 from kwork_parser_bot.bots.main_bot.handlers import (
-    kwork,
     scheduler,
     menu,
+    kwork,
 )
 from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.core.config import get_app_settings
@@ -26,8 +26,11 @@ async def startup(dp: Dispatcher) -> None:
     init_scheduler(main_bot)
     dp.include_routers(
         menu.router,
-        kwork.router,
-        scheduler.router,
+        kwork.menu.router,
+        kwork.category.router,
+        scheduler.menu.router,
+        scheduler.add_job.router,
+        scheduler.remove_job.router,
     )
 
 
@@ -42,6 +45,6 @@ async def run_main_bot():
     try:
         await dp.start_polling(main_bot)
     except Exception as e:
-        logger.warning(e.args)
+        logger.error(e.args)
     finally:
         await shutdown(dp)

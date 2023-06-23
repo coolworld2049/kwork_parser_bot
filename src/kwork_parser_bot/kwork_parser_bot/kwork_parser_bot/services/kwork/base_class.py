@@ -16,13 +16,19 @@ from kwork_parser_bot.services.redis.main import cached_data
 class KworkCreds(BaseModel):
     login: str
     password: str
-    proxy: typing.Optional[str] = None
-    phone_last: typing.Optional[str] = None
+    phone: typing.Optional[str] = None
+
+    @property
+    def phone_last(self):
+        return self.phone[-4:]
 
 
 class KworkApi(Kwork):
     def __init__(self, kwork_creds: KworkCreds):
-        super().__init__(**kwork_creds.dict(exclude_none=True))
+        super().__init__(
+            **kwork_creds.dict(exclude_none=True, exclude={"phone"}),
+            phone_last=kwork_creds.phone_last,
+        )
         self.redis_prefix: str = "kwork_api"
 
     def kwork_creds_dict(self):

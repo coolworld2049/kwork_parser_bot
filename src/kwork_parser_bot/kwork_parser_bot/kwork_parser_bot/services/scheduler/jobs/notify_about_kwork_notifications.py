@@ -29,7 +29,7 @@ if __name__ == "__main__":
     kwork_creds = KworkCreds(
         login=get_app_settings().KWORK_LOGIN,
         password=get_app_settings().KWORK_PASSWORD,
-        phone_last=get_app_settings().KWORK_PHONE_LAST,
+        phone=get_app_settings().KWORK_PHONE,
     )
     loop = asyncio.get_event_loop()
     loop.run_until_complete(

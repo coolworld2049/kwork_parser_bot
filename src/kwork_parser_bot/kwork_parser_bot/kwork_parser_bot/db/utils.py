@@ -3,13 +3,24 @@ from sqlalchemy import text
 from kwork_parser_bot.core.config import get_app_settings
 from kwork_parser_bot.db.base import Base
 from kwork_parser_bot.db.models import load_all_models
-from kwork_parser_bot.db.session import engine
+from kwork_parser_bot.db.models.kwork_account import KworkAccount
+from kwork_parser_bot.db.session import engine, get_db
 
 
 async def create_database():
     load_all_models()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    async with get_db() as db:
+        db.add(
+            KworkAccount(
+                login=get_app_settings().KWORK_LOGIN,
+                password=KworkAccount.get_hashed_password(
+                    get_app_settings().KWORK_PASSWORD
+                ),
+                phone=get_app_settings().KWORK_PHONE,
+            )
+        )
 
 
 async def drop_database() -> None:

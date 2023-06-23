@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from kwork_parser_bot.bots.main_bot.callbacks import SchedulerCallback
-from kwork_parser_bot.schemas import SchedJob
+from kwork_parser_bot.schemas.kwork.schedjob import SchedJob
 
 
 def scheduler_menu_keyboard_builder():

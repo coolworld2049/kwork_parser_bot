@@ -4,7 +4,7 @@ from kwork.types import Project
 
 from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.core.config import get_app_settings
-from kwork_parser_bot.schemas.project import ProjectExtended
+from kwork_parser_bot.schemas.kwork.project import ProjectExtended
 from kwork_parser_bot.services.kwork.base_class import KworkCreds
 from kwork_parser_bot.services.kwork.lifetime import get_user_kwork_api
 from kwork_parser_bot.services.redis.lifetime import redis_pool
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     kwork_creds = KworkCreds(
         login=get_app_settings().KWORK_LOGIN,
         password=get_app_settings().KWORK_PASSWORD,
-        phone_last=get_app_settings().KWORK_PHONE_LAST,
+        phone=get_app_settings().KWORK_PHONE,
     )
     loop = asyncio.get_event_loop()
     loop.run_until_complete(

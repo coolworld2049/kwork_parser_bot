@@ -5,5 +5,8 @@ from kwork_parser_bot.bots.main_bot.main import run_main_bot
 
 if __name__ == "__main__":
     configure_logging()
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(run_main_bot())
+    try:
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(run_main_bot())
+    except* (KeyboardInterrupt, SystemExit) as e:
+        pass

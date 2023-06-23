@@ -2,7 +2,17 @@ import json
 import typing
 from datetime import timedelta
 
-from redis.asyncio.client import Redis
+from redis.asyncio import Redis
+
+from kwork_parser_bot.core.config import get_app_settings
+
+redis = Redis(
+    host=get_app_settings().REDIS_MASTER_HOST,
+    port=get_app_settings().REDIS_MASTER_PORT_NUMBER,
+    password=get_app_settings().REDIS_PASSWORD,
+    db=get_app_settings().REDIS_DATABASE,
+    max_connections=get_app_settings().REDIS_MAX_CONNECTIONS,
+)
 
 
 async def cached_data(

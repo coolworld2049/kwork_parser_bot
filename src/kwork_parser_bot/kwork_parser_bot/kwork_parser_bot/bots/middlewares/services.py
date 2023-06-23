@@ -1,12 +1,11 @@
-from pprint import pprint  # noqa
 from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
-from loguru import logger  # noqa
+from redis.asyncio.client import Redis
 
 
-class LoggingMiddleware(BaseMiddleware):
+class ServicesMiddleware(BaseMiddleware):
     async def __call__(
         self,
         handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
@@ -14,7 +13,11 @@ class LoggingMiddleware(BaseMiddleware):
         data: Dict[str, Any],
     ) -> Any:
         result = await handler(event, data)
-        # pprint(event, compact=True)
-        # pprint(data, compact=True)
-        print(f"result:{result}\n")
+        async with Redis(
+            connection_pool=data.get("bot").redis_pool,
+            single_connection_client=True,
+        ) as redis:
+            data["redis"] = redis
+        data["kwork_api"] = data.get("bot").kwork_api
+        data["sched"] = data.get("bot").sched
         return result

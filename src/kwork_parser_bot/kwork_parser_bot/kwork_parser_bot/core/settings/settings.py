@@ -33,6 +33,14 @@ class RedisSettings(BaseAppSettings):
     REDIS_DATABASE: Optional[int] = 5
     REDIS_MAX_CONNECTIONS: Optional[int] = 1000
 
+    @property
+    def redis_url(self):
+        return (
+            f"redis://:{self.REDIS_MASTER_PASSWORD}@"
+            f"{self.REDIS_MASTER_HOST}:{self.REDIS_MASTER_PORT_NUMBER}"
+            f"/{self.REDIS_DATABASE}"
+        )
+
 
 class PostgresSettings(BaseAppSettings):
     POSTGRESQL_USERNAME: str

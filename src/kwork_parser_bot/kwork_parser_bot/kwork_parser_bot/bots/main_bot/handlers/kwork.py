@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from loguru import logger
 
-from kwork_parser_bot.bots.dispatcher import redis
+from kwork_parser_bot.services.redis.main import redis
 from kwork_parser_bot.bots.main_bot.callbacks import (
     KworkCategoryCallback,
     SchedulerCallback,

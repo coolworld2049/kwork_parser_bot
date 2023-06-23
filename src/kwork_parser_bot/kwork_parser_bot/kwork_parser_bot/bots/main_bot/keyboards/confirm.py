@@ -4,20 +4,20 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from kwork_parser_bot.bots.main_bot.callbacks import ConfirmCallback
 
 
-def confirm_keyboard_builder(name: str = "rmjob"):
+def confirm_keyboard_builder(callback_name: str):
     builder = InlineKeyboardBuilder()
     builder.add(
         InlineKeyboardButton(
             text="✔️",
             callback_data=ConfirmCallback(
-                name=name,
+                name=callback_name,
                 answer="yes",
             ).pack(),
         ),
         InlineKeyboardButton(
             text="❌",
             callback_data=ConfirmCallback(
-                name=name,
+                name=callback_name,
                 answer="no",
             ).pack(),
         ),

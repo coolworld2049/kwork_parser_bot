@@ -14,13 +14,13 @@ from kwork_parser_bot.bots.main_bot.callbacks import (
     ConfirmCallback,
     KworkCategoryCallback,
 )
-from kwork_parser_bot.bots.main_bot.handlers.start import start_callback, start_message
+from kwork_parser_bot.bots.main_bot.handlers.menu import start_message, start_callback
 from kwork_parser_bot.bots.main_bot.keyboards.confirm import confirm_keyboard_builder
 from kwork_parser_bot.bots.main_bot.keyboards.menu import (
     menu_navigation_keyboard_builder,
 )
 from kwork_parser_bot.bots.main_bot.keyboards.scheduler import (
-    scheduler_keyboard_builder,
+    scheduler_menu_keyboard_builder,
 )
 from kwork_parser_bot.bots.main_bot.loader import main_bot, async_scheduler
 from kwork_parser_bot.bots.main_bot.sched.main import remove_job, get_user_job
@@ -35,7 +35,7 @@ router = Router(name=__file__)
 @router.callback_query(MenuCallback.filter(F.name == "sched"))
 async def scheduler_menu(query: CallbackQuery, state: FSMContext):
     jobs = get_user_job(query.from_user.id)
-    builder = scheduler_keyboard_builder()
+    builder = scheduler_menu_keyboard_builder()
     builder = menu_navigation_keyboard_builder(
         menu_callback=MenuCallback(name="start").pack(),
         inline_buttons=builder.buttons,
@@ -125,7 +125,7 @@ async def scheduler_remove_job_confirm(message: Message, state: FSMContext):
     await main_bot.delete_message(
         message.from_user.id, state_data.get("prev_message_id")
     )
-    builder = confirm_keyboard_builder()
+    builder = confirm_keyboard_builder(callback_name="rmjob")
     await message.reply(
         "Confirm removing",
         reply_markup=builder.as_markup(),

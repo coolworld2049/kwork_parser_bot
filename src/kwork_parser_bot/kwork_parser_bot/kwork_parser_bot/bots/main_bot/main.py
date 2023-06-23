@@ -3,6 +3,7 @@ import asyncio
 from aiogram import Dispatcher
 from loguru import logger
 
+import kwork_parser_bot.bots.main_bot.handlers.menu
 from kwork_parser_bot.bots.dispatcher import dp
 from kwork_parser_bot.bots.main_bot.handlers import (
     help,
@@ -22,7 +23,7 @@ async def startup(dp: Dispatcher) -> None:
         await main_bot.set_my_commands(commands=get_app_settings().BOT_COMMANDS)
     await main_bot.delete_webhook(drop_pending_updates=True)
     dp.include_routers(
-        start.router,
+        kwork_parser_bot.bots.main_bot.handlers.menu.router,
         help.router,
         kwork.router,
         scheduler.router,

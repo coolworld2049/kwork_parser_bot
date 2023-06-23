@@ -11,9 +11,9 @@ from kwork_parser_bot.bots.main_bot.callbacks import (
 )
 from kwork_parser_bot.bots.main_bot.keyboards.kwork import (
     category_keyboard_builder,
-    sched_jobs_keyboard_builder,
     kwork_menu_keyboard_builder,
 )
+from kwork_parser_bot.bots.main_bot.keyboards.scheduler import scheduler_jobs_keyboard_builder
 from kwork_parser_bot.bots.main_bot.keyboards.menu import (
     menu_navigation_keyboard_builder,
 )
@@ -51,7 +51,7 @@ async def kwork_menu(query: CallbackQuery, state: FSMContext):
         )
     ]
     builder = kwork_menu_keyboard_builder()
-    builder_sched_jobs = sched_jobs_keyboard_builder(sched_jobs)
+    builder_sched_jobs = scheduler_jobs_keyboard_builder(sched_jobs)
     builder.add(*list(builder_sched_jobs.buttons))
     builder.adjust(1)
     builder = menu_navigation_keyboard_builder(
@@ -81,7 +81,7 @@ async def category(
     )
     await main_bot.send_message(
         query.from_user.id,
-        text="🤖 Categories Menu 🤖",
+        text="🤖 Category 🤖",
         reply_markup=builder.as_markup(),
     )
     await query.message.delete()
@@ -102,7 +102,7 @@ async def subcategory(
     )
     await main_bot.send_message(
         query.from_user.id,
-        text="🤖 Subcategories Menu 🤖",
+        text="🤖 Subcategory 🤖",
         reply_markup=builder.as_markup(),
     )
     await state.update_data(category_id=callback_data.category_id)
@@ -144,7 +144,7 @@ async def subcategory_sched_job(
             ),
         )
     ]
-    builder = sched_jobs_keyboard_builder(sched_jobs)
+    builder = scheduler_jobs_keyboard_builder(sched_jobs)
     builder = menu_navigation_keyboard_builder(
         builder,
         back_callback=KworkCategoryCallback(
@@ -156,7 +156,7 @@ async def subcategory_sched_job(
     )
     await main_bot.send_message(
         query.from_user.id,
-        text="🤖 Sched jobs Menu 🤖",
+        text="🤖 Scheduler jobs menu 🤖",
         reply_markup=builder.as_markup(),
     )
     await state.update_data(

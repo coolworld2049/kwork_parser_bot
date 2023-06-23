@@ -21,8 +21,8 @@ def remove_job(user_id: int, job_id: str | list[str]):
                 async_scheduler.remove_job(id)
             else:
                 raise
-            results.append(f"{id} successfully deleted")
+            results.append(f"{id} successfully deleted!")
         except Exception as e:
             logger.debug(e)
-            results.append(f"{id} not deleted")
+            results.append(f"{id} not deleted!")
     return results

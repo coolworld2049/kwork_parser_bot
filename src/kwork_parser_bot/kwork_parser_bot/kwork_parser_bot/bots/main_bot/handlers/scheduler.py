@@ -99,7 +99,7 @@ async def scheduler_add_job_process(
             sched_job.func = sched_job.func
             sched_job.trigger = cron_trigger
             sched_job_data: dict = sched_job.dict(exclude_none=True)
-            sched_job_data.update({"id": f"{sched_job.id}:{sched_job.name}"})
+            sched_job_data.update({"id": sched_job.id})
             scheduler.add_job(**sched_job_data)
             await start_message(message, state, kwork_api)
         except Exception as e:

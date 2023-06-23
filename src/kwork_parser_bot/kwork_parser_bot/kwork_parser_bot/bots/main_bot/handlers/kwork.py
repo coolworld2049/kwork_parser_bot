@@ -39,7 +39,7 @@ async def kwork_menu(query: CallbackQuery, state: FSMContext, kwork_api: KworkAp
                 action="add",
                 user_id=query.from_user.id,
             ),
-            name="account notifications",
+            name="account",
             func=f"{get_app_settings().SCHED_JOBS_MODULE}:notify_about_kwork_notifications",
             args=(
                 kwork_api.kwork_creds_dict(),
@@ -71,7 +71,7 @@ async def category_menu(
     callback_data: KworkCategoryCallback,
     state: FSMContext,
     kwork_api: KworkApi,
-    redis_pool: ConnectionPool
+    redis_pool: ConnectionPool,
 ):
     await state.clear()
     category = await kwork_api.cached_category(redis_pool)
@@ -95,7 +95,7 @@ async def subcategory(
     callback_data: KworkCategoryCallback,
     state: FSMContext,
     kwork_api: KworkApi,
-    redis_pool: ConnectionPool
+    redis_pool: ConnectionPool,
 ):
     category = await kwork_api.cached_category(redis_pool)
     builder = category_keyboard_builder(
@@ -122,7 +122,7 @@ async def subcategory_sched_job(
     state: FSMContext,
     kwork_api: KworkApi,
     scheduler: Scheduler,
-    redis_pool: ConnectionPool
+    redis_pool: ConnectionPool,
 ):
     state_data = await state.get_data()
     category_id: int = state_data.get("category_id")
@@ -145,7 +145,7 @@ async def subcategory_sched_job(
         SchedJob(
             text="🆕 Notify about new projects",
             callback=notify_about_new_projects_callback,
-            name=f"notifications by {parent_category.name}-{category.name}",
+            name=f"{parent_category.name}-{category.name}",
             func=f"{get_app_settings().SCHED_JOBS_MODULE}:notify_about_new_projects",
             args=(
                 kwork_api.kwork_creds_dict(),

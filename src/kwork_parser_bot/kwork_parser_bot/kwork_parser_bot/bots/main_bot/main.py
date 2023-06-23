@@ -10,7 +10,10 @@ from kwork_parser_bot.bots.main_bot.handlers import (
 from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.core.config import get_app_settings
 from kwork_parser_bot.services.redis.lifetime import init_redis, shutdown_redis
-from kwork_parser_bot.services.scheduler.lifetime import init_scheduler, shutdown_scheduler
+from kwork_parser_bot.services.scheduler.lifetime import (
+    init_scheduler,
+    shutdown_scheduler,
+)
 
 
 async def startup(dp: Dispatcher) -> None:

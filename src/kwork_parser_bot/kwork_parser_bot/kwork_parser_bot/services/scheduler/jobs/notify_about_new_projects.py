@@ -41,7 +41,7 @@ async def notify_about_new_projects(
                 categories, p.parent_category_id
             ).name
             new_projects.append(p)
-        job = scheduler.get_user_job(user_id, job_id)
+        job = scheduler.get_job(job_id)
         rendered = render_template(
             "projects.html",
             job=job,
@@ -76,11 +76,15 @@ if __name__ == "__main__":
     kwork_creds = KworkCreds(
         login=get_app_settings().KWORK_LOGIN,
         password=get_app_settings().KWORK_PASSWORD,
-        phone_last=get_app_settings().KWORK_PHONE_LAST
+        phone_last=get_app_settings().KWORK_PHONE_LAST,
     )
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
         notify_about_new_projects(
-            kwork_creds.dict(), 1070277776, 1070277776, [11], "scheduler:job:add:1070277776:11:41"
+            kwork_creds.dict(),
+            1070277776,
+            1070277776,
+            [11],
+            "scheduler:job:add:1070277776:11:41",
         )
     )

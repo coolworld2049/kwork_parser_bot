@@ -70,13 +70,10 @@ def configure_logging() -> None:  # pragma: no cover
 
     logging.basicConfig(handlers=[intercept_handler], level=logging.NOTSET)
 
-    for logger_name in logging.root.manager.loggerDict:
-        if logger_name.startswith("uvicorn."):
-            logging.getLogger(logger_name).handlers = []
-
-    # change handler for default uvicorn logger
-    logging.getLogger("uvicorn").handlers = [intercept_handler]
-    logging.getLogger("uvicorn.access").handlers = [intercept_handler]
+    # for logger_name in logging.root.manager.loggerDict:
+    #     if logger_name.startswith("aiogram."):
+    #         # change handler for default uvicorn logger
+    #         logging.getLogger(logger_name).handlers = [intercept_handler]
 
     # set logs output, level and format
     logger.remove()

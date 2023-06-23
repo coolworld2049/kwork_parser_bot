@@ -10,7 +10,6 @@ from kwork_parser_bot.services.kwork.lifetime import get_user_kwork_api
 
 
 class ServicesMiddleware(BaseMiddleware):
-
     async def __call__(
         self,
         handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
@@ -28,7 +27,7 @@ class ServicesMiddleware(BaseMiddleware):
             kwork_creds = KworkCreds(
                 login=get_app_settings().KWORK_LOGIN,
                 password=get_app_settings().KWORK_PASSWORD,
-                phone_last=get_app_settings().KWORK_PHONE_LAST
+                phone_last=get_app_settings().KWORK_PHONE_LAST,
             )
         else:
             kwork_creds = None

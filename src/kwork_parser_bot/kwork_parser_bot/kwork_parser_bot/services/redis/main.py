@@ -17,10 +17,7 @@ redis = Redis(
 
 
 async def cached_data(
-    func: typing.Any = None,
-    *,
-    key: str,
-    ex: timedelta = timedelta(days=1)
+    func: typing.Any = None, *, key: str, ex: timedelta = timedelta(days=1)
 ):
     async with Redis(connection_pool=redis_pool) as redis:
         cache_data: bytes = await redis.get(key)

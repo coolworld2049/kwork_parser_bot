@@ -7,7 +7,7 @@ from kwork.types.category import Subcategory
 from redis.asyncio.client import Redis
 
 from kwork_parser_bot.bots.dispatcher import redis
-from kwork_parser_bot.bots.redis.caching import cached_data
+from kwork_parser_bot.services.redis.caching import cached_data
 from kwork_parser_bot.core.config import get_app_settings
 
 kwork_api = Kwork(

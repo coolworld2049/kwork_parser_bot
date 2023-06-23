@@ -7,9 +7,12 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import User, Message, CallbackQuery
 
 from kwork_parser_bot.bots.main_bot.callbacks import MenuCallback, KworkCategoryCallback
-from kwork_parser_bot.bots.main_bot.keyboards.menu import menu_keyboard_builder, menu_navigation_keyboard_builder
+from kwork_parser_bot.bots.main_bot.keyboards.menu import (
+    menu_keyboard_builder,
+    menu_navigation_keyboard_builder,
+)
 from kwork_parser_bot.bots.main_bot.loader import main_bot
-from kwork_parser_bot.bots.main_bot.thirdparty.kwork.main import get_my_account
+from kwork_parser_bot.services.kwork.main import get_my_account
 from kwork_parser_bot.core.config import get_app_settings
 from kwork_parser_bot.template_engine import render_template
 

@@ -1,4 +1,4 @@
-from pprint import pprint
+from pprint import pprint  # noqa
 from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
@@ -14,7 +14,7 @@ class LoggingMiddleware(BaseMiddleware):
         data: Dict[str, Any],
     ) -> Any:
         result = await handler(event, data)
-        pprint(event, compact=True)
-        pprint(data, compact=True)
+        # pprint(event, compact=True)
+        # pprint(data, compact=True)
         print(f"result:{result}\n")
         return result

@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import (
 
 from kwork_parser_bot.core.config import get_app_settings
 
-engine = create_async_engine(get_app_settings().pgbouncer_url.replace("postgresql", "postgresql+asyncpg"))
+engine = create_async_engine(get_app_settings().pgbouncer_url_async)
 session = async_sessionmaker(engine, autocommit=False)
 
 

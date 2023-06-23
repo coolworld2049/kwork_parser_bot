@@ -13,28 +13,29 @@ from kwork_parser_bot.bots.main_bot.keyboards.kwork import (
     category_keyboard_builder,
     kwork_menu_keyboard_builder,
 )
-from kwork_parser_bot.bots.main_bot.keyboards.scheduler import scheduler_jobs_keyboard_builder
 from kwork_parser_bot.bots.main_bot.keyboards.menu import (
     menu_navigation_keyboard_builder,
 )
+from kwork_parser_bot.bots.main_bot.keyboards.scheduler import (
+    scheduler_jobs_keyboard_builder,
+)
 from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.bots.main_bot.states import SchedulerState
-from kwork_parser_bot.bots.main_bot.thirdparty.kwork.main import (
+from kwork_parser_bot.services.kwork.main import (
     cached_categories,
     get_parent_category,
     get_category,
     kwork_api,
 )
+from kwork_parser_bot.core.config import get_app_settings
 from kwork_parser_bot.schemas import SchedJob
-
-sched_jobs_pkg = f"{'.'.join(str(__package__).split('.')[:-1])}.sched.jobs"
 
 router = Router(name=__file__)
 
 
 @router.callback_query(MenuCallback.filter(F.name == "kwork"))
 async def kwork_menu(query: CallbackQuery, state: FSMContext):
-    sched_jobs = [  # Todo
+    sched_jobs = [
         SchedJob(
             text="🔔 Receive account notifications",
             callback=SchedulerCallback(
@@ -43,7 +44,7 @@ async def kwork_menu(query: CallbackQuery, state: FSMContext):
                 user_id=query.from_user.id,
             ),
             name="account notifications",
-            func=f"{sched_jobs_pkg}:notify_about_kwork_notifications",
+            func=f"{get_app_settings().SCHED_JOBS_MODULE}:notify_about_kwork_notifications",
             args=(
                 query.from_user.id,
                 query.from_user.id,
@@ -135,7 +136,7 @@ async def subcategory_sched_job(
             text="🆕 Notify about new projects",
             callback=notify_about_new_projects_callback,
             name=f"notifications by {parent_category.name}-{category.name}",
-            func=f"{sched_jobs_pkg}:notify_about_new_projects",
+            func=f"{get_app_settings().SCHED_JOBS_MODULE}:notify_about_new_projects",
             args=(
                 query.from_user.id,
                 query.from_user.id,

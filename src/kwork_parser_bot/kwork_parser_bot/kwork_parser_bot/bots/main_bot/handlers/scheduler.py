@@ -22,8 +22,12 @@ from kwork_parser_bot.bots.main_bot.keyboards.menu import (
 from kwork_parser_bot.bots.main_bot.keyboards.scheduler import (
     scheduler_menu_keyboard_builder,
 )
-from kwork_parser_bot.bots.main_bot.loader import main_bot, async_scheduler
-from kwork_parser_bot.bots.main_bot.sched.main import remove_job, get_user_job
+from kwork_parser_bot.bots.main_bot.loader import main_bot
+from kwork_parser_bot.services.sched.main import (
+    async_scheduler,
+    get_user_job,
+    remove_job,
+)
 from kwork_parser_bot.bots.main_bot.states import SchedulerState
 from kwork_parser_bot.core.config import get_app_settings
 from kwork_parser_bot.schemas import SchedJob

@@ -15,15 +15,14 @@ redis = Redis(
     password=get_app_settings().REDIS_PASSWORD,
     db=get_app_settings().REDIS_DATABASE,
     max_connections=get_app_settings().REDIS_MAX_CONNECTIONS,
-    encoding="utf-8",
 )
 
 dp = Dispatcher(
     events_isolation=RedisEventIsolation(redis)
-    if get_app_settings().USE_REDIS
+    if get_app_settings().REDIS_MASTER_HOST
     else None,
     storage=RedisStorage(redis, state_ttl=600, data_ttl=600)
-    if get_app_settings().USE_REDIS
+    if get_app_settings().REDIS_MASTER_HOST
     else MemoryStorage(),
     name=pathlib.Path(__file__).name,
 )

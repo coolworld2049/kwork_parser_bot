@@ -1,6 +1,13 @@
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from loguru import logger
 
-from kwork_parser_bot.bots.main_bot.loader import async_scheduler
+from kwork_parser_bot.core.config import get_app_settings
+
+async_scheduler = AsyncIOScheduler(timezone=get_app_settings().TIMEZONE)
+async_scheduler.add_jobstore(
+    "sqlalchemy",
+    url=get_app_settings().pgbouncer_url,
+)
 
 
 def get_user_job(user_id: int, job_id: str = None):

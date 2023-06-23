@@ -12,7 +12,7 @@ from kwork_parser_bot.bots.main_bot.keyboards.menu import (
 )
 from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.bots.main_bot.sched.main import get_user_job
-from kwork_parser_bot.bots.main_bot.thirdparty.kwork.main import (
+from kwork_parser_bot.services.kwork import (
     cached_categories,
     get_parent_category,
     get_category,

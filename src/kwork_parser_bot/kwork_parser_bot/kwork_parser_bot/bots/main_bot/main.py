@@ -4,11 +4,13 @@ from loguru import logger
 from kwork_parser_bot.bots.dispatcher import dp
 from kwork_parser_bot.bots.main_bot.handlers import (
     kwork,
-    scheduler, menu,
+    scheduler,
+    menu,
 )
-from kwork_parser_bot.bots.main_bot.loader import main_bot, async_scheduler
-from kwork_parser_bot.bots.main_bot.thirdparty.kwork.main import kwork_api
+from kwork_parser_bot.bots.main_bot.loader import main_bot
+from kwork_parser_bot.services.kwork.main import kwork_api
 from kwork_parser_bot.core.config import get_app_settings
+from kwork_parser_bot.services.sched.main import async_scheduler
 
 
 async def startup(dp: Dispatcher) -> None:

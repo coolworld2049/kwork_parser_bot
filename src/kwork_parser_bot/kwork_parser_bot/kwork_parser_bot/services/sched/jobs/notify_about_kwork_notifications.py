@@ -3,7 +3,7 @@ import asyncio
 from loguru import logger
 
 from kwork_parser_bot.bots.main_bot.loader import main_bot
-from kwork_parser_bot.bots.main_bot.thirdparty.kwork.main import kwork_api
+from kwork_parser_bot.services.kwork import kwork_api
 from kwork_parser_bot.template_engine import render_template
 
 

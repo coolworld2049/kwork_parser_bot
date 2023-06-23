@@ -64,7 +64,7 @@ def record_formatter(record: dict[str, Any]) -> str:  # pragma: no cover
     return log_format
 
 
-def configure_logging(*args, **kwargs) -> None:  # pragma: no cover
+def configure_logging() -> None:  # pragma: no cover
     """Configures logging."""
     intercept_handler = InterceptHandler()
 
@@ -81,15 +81,9 @@ def configure_logging(*args, **kwargs) -> None:  # pragma: no cover
     # set logs output, level and format
     logger.remove()
     logger.add(
-        sys.stdout,
-        level=get_app_settings().LOGGING_LEVEL,
-        format=record_formatter,
-        **kwargs
-    )
-    logger.add(
-        get_app_settings().LOG_FILE_PATH + "/access.log",
-        serialize=False,
-        level=get_app_settings().LOGGING_LEVEL,
+        get_app_settings().LOG_FILE_PATH + "/error.log",
+        serialize=True,
+        level=logging.WARNING,
         enqueue=True,
         backtrace=True,
         diagnose=True,
@@ -97,4 +91,21 @@ def configure_logging(*args, **kwargs) -> None:  # pragma: no cover
         rotation="128 MB",
         retention="14 days",
         compression="zip",
+    )
+    logger.add(
+        get_app_settings().LOG_FILE_PATH + "/access.log",
+        serialize=False,
+        level=logging.INFO,
+        enqueue=True,
+        backtrace=True,
+        diagnose=True,
+        encoding="UTF-8",
+        rotation="64 MB",
+        retention="14 days",
+        compression="zip",
+    )
+    logger.add(
+        sys.stdout,
+        level=get_app_settings().LOGGING_LEVEL,
+        format=record_formatter,
     )

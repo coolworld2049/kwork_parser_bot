@@ -12,5 +12,5 @@ apscheduler
 sqlalchemy-mixins
 pandas
 cron-validator
-pytest
-pytest-asyncio
+asyncpg
+psycopg2

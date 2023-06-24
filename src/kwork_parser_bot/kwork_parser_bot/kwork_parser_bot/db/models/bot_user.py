@@ -10,7 +10,7 @@ class BotUser(Base, TimestampsMixin):
     last_name = sa.Column(sa.String)
     username = sa.Column(sa.String)
     language_code = sa.Column(sa.String)
-    is_premium = sa.Column(sa.Boolean)
+    is_premium = sa.Column(sa.Boolean, default=False)
 
     @property
     def full_name(self):

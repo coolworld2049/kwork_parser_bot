@@ -20,7 +20,7 @@ def menu_keyboard_builder():
             ).pack(),
         ),
         InlineKeyboardButton(
-            text="ℹ️ Help",
+            text="📄 Help",
             callback_data=MenuCallback(
                 name="help",
             ).pack(),

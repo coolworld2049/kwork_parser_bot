@@ -1,6 +1,6 @@
 from contextlib import suppress
 
-from aiogram import Router, F
+from aiogram import Router, F, flags
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext

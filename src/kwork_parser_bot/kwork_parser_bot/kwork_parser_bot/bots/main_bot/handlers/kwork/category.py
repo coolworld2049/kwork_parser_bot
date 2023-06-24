@@ -10,7 +10,7 @@ from kwork_parser_bot.bots.main_bot.callbacks import (
     SchedulerCallback,
 )
 from kwork_parser_bot.bots.main_bot.keyboards.kwork import category_keyboard_builder
-from kwork_parser_bot.bots.main_bot.keyboards.menu import (
+from kwork_parser_bot.bots.main_bot.keyboards.navigation import (
     menu_navigation_keyboard_builder,
 )
 from kwork_parser_bot.bots.main_bot.keyboards.scheduler import (
@@ -21,7 +21,6 @@ from kwork_parser_bot.bots.main_bot.states import SchedulerState
 from kwork_parser_bot.core.config import get_app_settings
 from kwork_parser_bot.schemas.kwork.schedjob import SchedJob
 from kwork_parser_bot.services.kwork.base_class import KworkApi
-from kwork_parser_bot.services.scheduler.base_class import Scheduler
 
 router = Router(name=__file__)
 
@@ -35,6 +34,9 @@ async def category_menu(
     redis_pool: ConnectionPool,
 ):
     await state.clear()
+    if not kwork_api:
+        await query.answer("Bad kwork credentials")
+        return None
     category = await kwork_api.cached_category(redis_pool)
     builder = category_keyboard_builder(category, callback_name="subcategory")
     builder = menu_navigation_keyboard_builder(
@@ -82,7 +84,6 @@ async def subcategory_sched_job(
     callback_data: KworkCategoryCallback,
     state: FSMContext,
     kwork_api: KworkApi,
-    scheduler: Scheduler,
     redis_pool: ConnectionPool,
 ):
     state_data = await state.get_data()
@@ -101,6 +102,7 @@ async def subcategory_sched_job(
         category_id=category_id,
         subcategory_id=subcategory_id,
         user_id=query.from_user.id,
+        from_="category",
     )
     sched_jobs = [
         SchedJob(
@@ -109,7 +111,7 @@ async def subcategory_sched_job(
             name=f"{parent_category.name}-{category.name}",
             func=f"{get_app_settings().SCHED_JOBS_MODULE}:notify_about_new_projects",
             args=(
-                kwork_api.kwork_creds_dict(),
+                kwork_api.creds,
                 query.from_user.id,
                 query.from_user.id,
                 [category_id],

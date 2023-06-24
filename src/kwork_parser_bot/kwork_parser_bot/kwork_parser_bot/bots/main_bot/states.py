@@ -11,3 +11,10 @@ class SchedulerState(StatesGroup):
     add_job_process_input = State()
     add_job = State()
     remove_job = State()
+
+
+class KworkAuthState(StatesGroup):
+    start = State()
+    set_creds = State()
+    set_phone = State()
+    end = State()

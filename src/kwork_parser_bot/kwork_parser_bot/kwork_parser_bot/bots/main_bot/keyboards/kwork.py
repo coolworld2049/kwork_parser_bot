@@ -10,6 +10,21 @@ from kwork_parser_bot.bots.main_bot.callbacks import KworkCategoryCallback, Menu
 
 def kwork_menu_keyboard_builder():
     builder = InlineKeyboardBuilder()
+    builder.row(
+        InlineKeyboardButton(
+            text="🔑 Login",
+            callback_data=MenuCallback(
+                name="kwork-login",
+            ).pack(),
+        ),
+        InlineKeyboardButton(
+            text="🗑️ Logout",
+            callback_data=MenuCallback(
+                name="kwork-logout",
+            ).pack(),
+        ),
+        width=2,
+    )
     builder.add(
         InlineKeyboardButton(
             text="🔎 Categories",

@@ -5,9 +5,10 @@ from kwork_parser_bot.db.base import Base
 
 
 class KworkAccount(Base):
-    id = sa.Column(sa.BigInteger, primary_key=True, autoincrement=True)
-    first_name = sa.Column(sa.String)
-    last_name = sa.Column(sa.String)
+    id = sa.Column(
+        sa.BigInteger, sa.Sequence("kwork_account_seq_id"), autoincrement=True
+    )
+    telegram_id = sa.Column(sa.ForeignKey("bot_user.id"), primary_key=True)
     login = sa.Column(sa.String, nullable=False, unique=True)
     password = sa.Column(sa.String, nullable=False)
     phone = sa.Column(sa.String, nullable=False)

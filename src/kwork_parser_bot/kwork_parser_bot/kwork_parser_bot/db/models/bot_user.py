@@ -11,3 +11,7 @@ class BotUser(Base):
     username = sa.Column(sa.String)
     language_code = sa.Column(sa.String)
     is_premium = sa.Column(sa.Boolean)
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"

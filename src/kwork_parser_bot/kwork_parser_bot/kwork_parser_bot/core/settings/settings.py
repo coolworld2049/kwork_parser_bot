@@ -83,3 +83,4 @@ class Settings(MainBotSettings, RedisSettings, PgbouncerSettings):
     KWORK_LOGIN: Optional[str]
     KWORK_PASSWORD: Optional[str]
     KWORK_PHONE: Optional[str]
+    TEST_DATA: Optional[bool] = False

@@ -8,13 +8,16 @@ from kwork_parser_bot.bots.main_bot.keyboards.confirm import confirm_keyboard_bu
 from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.bots.main_bot.states import SchedulerState
 from kwork_parser_bot.services.kwork.base_class import KworkApi
-from kwork_parser_bot.services.scheduler.base_class import Scheduler
+from kwork_parser_bot.services.scheduler.lifetime import scheduler
 
 router = Router(name=__file__)
 
 
 @router.callback_query(SchedulerCallback.filter(F.action == "rm"))
-async def scheduler_remove_job_process(query: CallbackQuery, state: FSMContext):
+async def scheduler_remove_job_process(
+    query: CallbackQuery, callback_data: SchedulerCallback, state: FSMContext
+):
+    await state.clear()
     await query.answer(f"Enter a job ID e.g `aaa` or `aaa,bbb,ccc`", show_alert=True)
     await state.set_state(SchedulerState.remove_job)
     await state.update_data(prev_message_id=query.message.message_id)
@@ -43,7 +46,6 @@ async def scheduler_remove_job(
     callback_data: ConfirmCallback,
     state: FSMContext,
     kwork_api: KworkApi,
-    scheduler: Scheduler,
 ):
     state_data = await state.get_data()
     job_id: str | list[str] = state_data.get("job_id")
@@ -53,4 +55,4 @@ async def scheduler_remove_job(
     elif callback_data.answer == "no":
         await query.answer("Deletion canceled")
     await state.clear()
-    await scheduler_menu(query, state, kwork_api, scheduler)
+    await scheduler_menu(query, state, kwork_api)

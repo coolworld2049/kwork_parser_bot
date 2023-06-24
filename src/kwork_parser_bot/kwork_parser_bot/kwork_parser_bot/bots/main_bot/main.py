@@ -22,12 +22,13 @@ async def startup(dp: Dispatcher) -> None:
     else:
         await main_bot.set_my_commands(commands=get_app_settings().BOT_COMMANDS)
     await main_bot.delete_webhook(drop_pending_updates=True)
+    init_scheduler()
     init_redis(main_bot)
-    init_scheduler(main_bot)
     dp.include_routers(
         menu.router,
         kwork.menu.router,
         kwork.category.router,
+        kwork.auth.router,
         scheduler.menu.router,
         scheduler.add_job.router,
         scheduler.remove_job.router,
@@ -36,8 +37,8 @@ async def startup(dp: Dispatcher) -> None:
 
 async def shutdown(dp: Dispatcher) -> None:
     await dp.storage.close()
+    await shutdown_scheduler()
     await shutdown_redis(main_bot)
-    await shutdown_scheduler(main_bot)
 
 
 async def run_main_bot():

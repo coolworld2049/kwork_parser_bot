@@ -24,3 +24,4 @@ class SchedulerCallback(CallbackData, prefix="scheduler"):
     user_id: int | None
     category_id: int | None
     subcategory_id: int | None
+    from_: str | None

@@ -1,6 +1,8 @@
 from contextlib import asynccontextmanager
 
+from asyncpg import UniqueViolationError
 from loguru import logger
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     async_sessionmaker,
@@ -21,6 +23,7 @@ async def get_db() -> AsyncSession:
         await s.commit()
     except Exception as e:  # noqa
         await s.rollback()
-        logger.exception(e)
+        if not e.__class__.__name__ != IntegrityError.__class__.__name__:
+            logger.warning(e)
     finally:
         await s.close()

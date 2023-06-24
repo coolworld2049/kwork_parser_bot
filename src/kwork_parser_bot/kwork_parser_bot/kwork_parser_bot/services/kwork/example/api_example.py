@@ -1,7 +1,8 @@
+import asyncio
+import logging
+
 from kwork import Kwork
 from kwork.types import Actor, User, Connects
-import logging
-import asyncio
 
 logging.basicConfig(level=logging.INFO)
 

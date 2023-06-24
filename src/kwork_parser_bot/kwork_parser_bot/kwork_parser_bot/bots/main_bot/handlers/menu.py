@@ -14,19 +14,15 @@ from kwork_parser_bot.bots.main_bot.keyboards.navigation import (
     menu_navigation_keyboard_builder,
 )
 from kwork_parser_bot.bots.main_bot.loader import main_bot
-from kwork_parser_bot.bots.main_bot.states import KworkAuthState
 from kwork_parser_bot.core.config import get_app_settings
 from kwork_parser_bot.db.models.bot_user import BotUser
 from kwork_parser_bot.db.session import get_db
-from kwork_parser_bot.services.kwork.base_class import KworkApi
 from kwork_parser_bot.template_engine import render_template
 
 router = Router(name=__file__)
 
 
-async def start_cmd(
-    user: User, state: FSMContext, message_id: int, kwork_api: KworkApi
-):
+async def start_cmd(user: User, state: FSMContext, message_id: int):
     with suppress(TelegramBadRequest):
         await main_bot.delete_message(user.id, message_id - 1)
     await state.clear()
@@ -44,24 +40,18 @@ async def start_cmd(
 
 
 @router.message(Command("start"))
-async def start_message(message: Message, state: FSMContext, kwork_api: KworkApi):
-    await start_cmd(message.from_user, state, message.message_id, kwork_api)
-
-
-@router.message(KworkAuthState.end)
-async def start_message(message: Message, state: FSMContext, kwork_api: KworkApi):
-    await start_cmd(message.from_user, state, message.message_id, kwork_api)
+async def start_message(message: Message, state: FSMContext):
+    await start_cmd(message.from_user, state, message.message_id)
 
 
 @router.callback_query(MenuCallback.filter(F.name == "start"))
 async def start_callback(
     query: CallbackQuery,
     state: FSMContext,
-    kwork_api: KworkApi,
 ):
     with suppress(TelegramBadRequest):
         await query.message.delete()
-    await start_cmd(query.from_user, state, query.message.message_id, kwork_api)
+    await start_cmd(query.from_user, state, query.message.message_id)
 
 
 @router.callback_query(MenuCallback.filter(F.name == "help"))

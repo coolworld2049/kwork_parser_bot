@@ -16,7 +16,6 @@ from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.bots.main_bot.states import SchedulerState
 from kwork_parser_bot.core.config import get_app_settings
 from kwork_parser_bot.schemas.kwork.schedjob import SchedJob
-from kwork_parser_bot.services.kwork.base_class import KworkApi
 from kwork_parser_bot.services.scheduler.lifetime import scheduler
 from kwork_parser_bot.template_engine import render_template
 
@@ -48,9 +47,7 @@ async def scheduler_add_job_trigger_process(
 
 @router.message(SchedulerState.add_job)
 @message_process
-async def scheduler_add_job_process(
-    message: Message, state: FSMContext, kwork_api: KworkApi
-):
+async def scheduler_add_job_process(message: Message, state: FSMContext):
     state_data = await state.get_data()
     sched_jobs: list[SchedJob] = [SchedJob(**x) for x in state_data.get("sched_jobs")]
     for sched_job in sched_jobs:
@@ -62,4 +59,4 @@ async def scheduler_add_job_process(
         sched_job_data: dict = sched_job.dict(exclude_none=True)
         sched_job_data.update({"id": sched_job.id})
         scheduler.add_job(**sched_job_data)
-        await start_message(message, state, kwork_api)
+        await start_message(message, state)

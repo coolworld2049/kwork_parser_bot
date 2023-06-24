@@ -7,7 +7,6 @@ from kwork_parser_bot.bots.main_bot.handlers.scheduler.menu import scheduler_men
 from kwork_parser_bot.bots.main_bot.keyboards.confirm import confirm_keyboard_builder
 from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.bots.main_bot.states import SchedulerState
-from kwork_parser_bot.services.kwork.base_class import KworkApi
 from kwork_parser_bot.services.scheduler.lifetime import scheduler
 
 router = Router(name=__file__)
@@ -45,7 +44,6 @@ async def scheduler_remove_job(
     query: CallbackQuery,
     callback_data: ConfirmCallback,
     state: FSMContext,
-    kwork_api: KworkApi,
 ):
     state_data = await state.get_data()
     job_id: str | list[str] = state_data.get("job_id")
@@ -55,4 +53,4 @@ async def scheduler_remove_job(
     elif callback_data.answer == "no":
         await query.answer("Deletion canceled")
     await state.clear()
-    await scheduler_menu(query, state, kwork_api)
+    await scheduler_menu(query, state)

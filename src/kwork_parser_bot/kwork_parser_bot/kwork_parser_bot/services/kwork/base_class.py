@@ -19,15 +19,20 @@ class KworkCreds(BaseModel):
 
     @property
     def phone_last(self):
-        return self.phone[-4:]
+        if self.phone:
+            return self.phone[-4:]
 
     @classmethod
     async def set_cache(
         cls, user_id, data: dict, ex: int | timedelta = timedelta(days=7)
     ):
-        return await cached_data(
+        kwork_creds = await cached_data(
             data=data, key=f"kwork_api:creds:{user_id}", ex=ex, update=True
         )
+        if kwork_creds:
+            return KworkCreds(**kwork_creds)
+        else:
+            return None
 
     @classmethod
     async def delete_cache(
@@ -42,7 +47,7 @@ class KworkCreds(BaseModel):
         if kwork_creds:
             return KworkCreds(**kwork_creds)
         else:
-            return kwork_creds
+            return None
 
 
 class KworkApi(Kwork):

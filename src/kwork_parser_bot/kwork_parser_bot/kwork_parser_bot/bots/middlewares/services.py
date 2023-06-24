@@ -17,14 +17,13 @@ class ServicesMiddleware(BaseMiddleware):
         statement = await db.execute(
             select(KworkAccount).filter_by(telegram_id=user.id)
         )
-        kwork_account_obj: KworkAccount = statement.scalar()
-        kwork_account_data = kwork_account_obj.to_dict()
-        if not KworkAccount.check_password(
-            cached_creds.password, kwork_account_data.get("password")
-        ):
-            raise Exception("Bad kwork credentials")
-        kwork_account_data.update({"password": cached_creds.password})
-        return KworkApi(KworkCreds(**kwork_account_data))
+        account_obj: KworkAccount = statement.scalar()
+        if not KworkAccount.check_password(cached_creds.password, account_obj.password):
+            raise Exception("Bad credentials")
+        account_data = account_obj.__dict__.copy()
+        account_data.update({"password": cached_creds.password})
+        api = KworkApi(KworkCreds(**account_data))
+        return api
 
     async def __call__(
         self,
@@ -34,13 +33,13 @@ class ServicesMiddleware(BaseMiddleware):
     ) -> Any:
         data["kwork_api"] = None
         data["redis_pool"] = data.get("bot").__getattribute__("redis_pool")
-        user: User = data.get("event_from_user")
         async with get_db() as db:
             try:
-                cached_kwork_creds = await KworkCreds.get_cached(user.id)
-                if not cached_kwork_creds:
-                    raise ValueError(f"cached_kwork_creds: {cached_kwork_creds}")
-                kwork_api = await self.provide_kwork_api(db, user, cached_kwork_creds)
+                user = data.get("event_from_user")
+                cached_creds = await KworkCreds.get_cached(user.id)
+                if not cached_creds:
+                    raise ValueError(f"cached_creds: {cached_creds}")
+                kwork_api = await self.provide_kwork_api(db, user, cached_creds)
                 data["kwork_api"] = kwork_api
                 logger.debug(kwork_api.__dict__)
             except Exception as e:

@@ -6,8 +6,6 @@ from loguru import logger
 
 from kwork_parser_bot.core.config import get_app_settings
 
-logger = logger
-
 
 class InterceptHandler(logging.Handler):
     """

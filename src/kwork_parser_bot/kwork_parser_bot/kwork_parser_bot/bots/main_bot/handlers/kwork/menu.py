@@ -2,7 +2,6 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from sqlalchemy import select
 
 from kwork_parser_bot.bots.main_bot.callbacks import (
     SchedulerCallback,
@@ -21,8 +20,6 @@ from kwork_parser_bot.bots.main_bot.keyboards.scheduler import (
 from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.bots.main_bot.states import SchedulerState, KworkAuthState
 from kwork_parser_bot.core.config import get_app_settings
-from kwork_parser_bot.db.models.kwork_account import KworkAccount
-from kwork_parser_bot.db.session import get_db
 from kwork_parser_bot.schemas.kwork.schedjob import SchedJob
 from kwork_parser_bot.services.kwork.base_class import KworkApi
 from kwork_parser_bot.template_engine import render_template
@@ -32,15 +29,11 @@ router = Router(name=__file__)
 
 @router.callback_query(MenuCallback.filter(F.name == "kwork"))
 async def kwork_menu(query: CallbackQuery, state: FSMContext, kwork_api: KworkApi):
-    async with get_db() as db:
-        kwork_account_st = await db.execute(
-            select(KworkAccount).where(KworkAccount.telegram_id == query.from_user.id)
-        )
-        kwork_account_obj: KworkAccount = kwork_account_st.scalar()
-        if not kwork_account_obj:
-            await state.set_state(KworkAuthState.set_creds)
-            await auth_menu(query.from_user, state)
-            return None
+    if not kwork_api:
+        await state.set_state(KworkAuthState.set_login)
+        await query.message.delete()
+        await auth_menu(query.from_user, state)
+        return None
     try:
         account = await kwork_api.my_account(query.from_user.id)
     except AttributeError as e:

@@ -17,11 +17,11 @@ from kwork_parser_bot.services.scheduler.lifetime import (
 
 
 async def startup(dp: Dispatcher) -> None:
+    await main_bot.delete_webhook(drop_pending_updates=True)
     if await main_bot.get_my_commands() == get_app_settings().BOT_COMMANDS:
         await main_bot.delete_my_commands()
     else:
         await main_bot.set_my_commands(commands=get_app_settings().BOT_COMMANDS)
-    await main_bot.delete_webhook(drop_pending_updates=True)
     init_scheduler()
     init_redis(main_bot)
     dp.include_routers(

@@ -1,17 +1,28 @@
 import asyncio
 import html
+from contextlib import suppress
 from functools import wraps
+
+from aiogram.exceptions import TelegramBadRequest
+from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
+from loguru import logger
 
 
 def message_process(func):
     async def process_error(e, *args, **kwargs):
-        message = args[0]
-        bot = kwargs.get("state").bot
+        message: Message = args[0]
+        state: FSMContext = kwargs.get("state")
+        bot = state.bot
         message_answer = await message.answer(
-            f"Error <code>{html.escape(e.args.__str__())}</code>. Try again"
+            f"<code>{html.escape(' '.join(e.args))}</code>"
         )
-        await asyncio.sleep(1.5)
-        await bot.delete_message(message.from_user.id, message_answer.message_id)
+        await asyncio.sleep(1.7)
+        with suppress(TelegramBadRequest):
+            for m_id in range(
+                message_answer.message_id - 1, message_answer.message_id + 1
+            ):
+                await bot.delete_message(message.from_user.id, m_id)
 
     if asyncio.iscoroutinefunction(func):
 
@@ -19,7 +30,8 @@ def message_process(func):
         async def wrapper(*args, **kwargs):
             try:
                 return await func(*args, **kwargs)
-            except ValueError as e:
+            except Exception as e:
+                logger.debug(e)
                 await process_error(e, *args, **kwargs)
 
         return wrapper
@@ -29,7 +41,8 @@ def message_process(func):
         def wrapper(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
-            except ValueError as e:
+            except Exception as e:
+                logger.debug(e)
                 loop = asyncio.get_event_loop()
                 loop.run_until_complete(process_error(e, *args, **kwargs))
 

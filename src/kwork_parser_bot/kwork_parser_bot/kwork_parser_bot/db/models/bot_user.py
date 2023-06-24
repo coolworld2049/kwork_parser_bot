@@ -1,9 +1,9 @@
 import sqlalchemy as sa
 
-from kwork_parser_bot.db.base import Base
+from kwork_parser_bot.db.base import Base, TimestampsMixin
 
 
-class BotUser(Base):
+class BotUser(Base, TimestampsMixin):
     id = sa.Column(sa.BigInteger, primary_key=True)
     is_bot = sa.Column(sa.Boolean, nullable=False)
     first_name = sa.Column(sa.String, nullable=False)

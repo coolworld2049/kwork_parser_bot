@@ -80,7 +80,7 @@ class Settings(MainBotSettings, RedisSettings, PgbouncerSettings):
     LOGGING_LEVEL: Optional[str] = logging.getLevelName(
         os.getenv("LOGGING_LEVEL", "INFO")
     )
-    KWORK_LOGIN: Optional[str]
-    KWORK_PASSWORD: Optional[str]
-    KWORK_PHONE: Optional[str]
+    TEST_KWORK_LOGIN: Optional[str]
+    TEST_KWORK_PASSWORD: Optional[str]
+    TEST_KWORK_PHONE: Optional[str]
     TEST_DATA: Optional[bool] = False

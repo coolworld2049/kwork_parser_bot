@@ -25,11 +25,11 @@ async def create_database():
             db.add(
                 KworkAccount(
                     telegram_id=get_app_settings().BOT_OWNER_ID,
-                    login=get_app_settings().KWORK_LOGIN,
+                    login=get_app_settings().TEST_KWORK_LOGIN,
                     password=KworkAccount.get_hashed_password(
-                        get_app_settings().KWORK_PASSWORD
+                        get_app_settings().TEST_KWORK_PASSWORD
                     ),
-                    phone=get_app_settings().KWORK_PHONE,
+                    phone=get_app_settings().TEST_KWORK_PHONE,
                 )
             )
 

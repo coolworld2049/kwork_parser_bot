@@ -27,8 +27,22 @@ def kwork_menu_keyboard_builder():
     )
     builder.add(
         InlineKeyboardButton(
-            text="🔎 Categories",
+            text="🔎 Category",
             callback_data=MenuCallback(name="category").pack(),
+        ),
+    )
+    return builder
+
+
+def auth_keyboard_builder(callback_name: str = "kwork-login"):
+    builder = InlineKeyboardBuilder()
+    builder.add(
+        InlineKeyboardButton(
+            text="❌",
+            callback_data=MenuCallback(
+                name=callback_name,
+                action="rm",
+            ).pack(),
         ),
     )
     return builder

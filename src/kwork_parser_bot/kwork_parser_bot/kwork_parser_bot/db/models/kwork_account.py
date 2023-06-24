@@ -1,10 +1,10 @@
 import bcrypt
 import sqlalchemy as sa
 
-from kwork_parser_bot.db.base import Base
+from kwork_parser_bot.db.base import Base, TimestampsMixin
 
 
-class KworkAccount(Base):
+class KworkAccount(Base, TimestampsMixin):
     id = sa.Column(
         sa.BigInteger, sa.Sequence("kwork_account_seq_id"), autoincrement=True
     )

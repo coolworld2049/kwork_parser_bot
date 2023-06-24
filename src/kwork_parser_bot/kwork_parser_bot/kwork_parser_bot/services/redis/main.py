@@ -21,7 +21,7 @@ async def cached_data(
         async with Redis(connection_pool=redis_pool) as redis:
             await redis.expire(key, ex)
             if update:
-                data = await redis.set(key, json.dumps(data), ex=ex)
+                await redis.set(key, json.dumps(data), ex=ex)
                 return data
             cache_data: bytes = await redis.get(key)
             if not cache_data or cache_data == b"null":
@@ -40,16 +40,11 @@ async def cached_data(
 
 
 async def retrieve_data(key: str):
-    try:
-        async with Redis(connection_pool=redis_pool) as redis:
-            return json.loads(await redis.get(key))
-    except Exception as e:
-        logger.debug(e.args)
+    async with Redis(connection_pool=redis_pool) as redis:
+        data = await redis.get(key)
+        return json.loads(data) if data else data
 
 
 async def delete_data(keys: list | tuple):
-    try:
-        async with Redis(connection_pool=redis_pool) as redis:
-            return await redis.delete(*keys)
-    except Exception as e:
-        logger.debug(e.args)
+    async with Redis(connection_pool=redis_pool) as redis:
+        return await redis.delete(*keys)

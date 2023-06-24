@@ -14,7 +14,7 @@ PGDATABASE=${PGDATABASE:-"app"}
 POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-"postgres"}
 export PGPASSWORD="$POSTGRES_PASSWORD"
 
-# Set the number of threads and duration for the test
+# Set the number of threads and duration for the tests
 THREADS="$(grep ^cpu\\scores /proc/cpuinfo | uniq | awk '{print $4}')"
 SCALE=${SCALE:-50}
 CLIENTS=${CLIENTS:-300}
@@ -134,7 +134,7 @@ for i in $(seq "$START" "$STEP" "$CLIENTS"); do
   else
     j="$(("$i" * "$TX_MUL"))"
   fi
-  # Run the selected test
+  # Run the selected tests
   if [ "$REVERT" = true ]; then
     _tmp="$i"
     i="$j"

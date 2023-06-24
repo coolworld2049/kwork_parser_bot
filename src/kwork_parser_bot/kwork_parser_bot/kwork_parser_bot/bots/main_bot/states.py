@@ -15,6 +15,6 @@ class SchedulerState(StatesGroup):
 
 class KworkAuthState(StatesGroup):
     start = State()
-    set_creds = State()
+    set_login = State()
+    set_password = State()
     set_phone = State()
-    end = State()

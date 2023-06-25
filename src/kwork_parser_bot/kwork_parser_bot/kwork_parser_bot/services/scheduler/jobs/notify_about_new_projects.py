@@ -73,9 +73,10 @@ async def notify_about_new_projects(
         job=job,
         projects=projects,
     )
-    await main_bot.send_message(
-        chat_id,
-        rendered,
-        disable_web_page_preview=True,
-    )
+    if send_message:
+        await main_bot.send_message(
+            chat_id,
+            rendered,
+            disable_web_page_preview=True,
+        )
     return projects

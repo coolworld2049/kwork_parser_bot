@@ -20,8 +20,8 @@ from kwork_parser_bot.core.config import get_app_settings
 from kwork_parser_bot.db import load_all_models
 from kwork_parser_bot.db.meta import meta
 from kwork_parser_bot.db.utils import create_database, drop_database
-from kwork_parser_bot.services.kwork.base_class import KworkCreds
-from kwork_parser_bot.services.scheduler.base_class import Scheduler
+from kwork_parser_bot.services.kwork.main import KworkCreds
+from kwork_parser_bot.services.scheduler.main import Scheduler
 
 
 @pytest.fixture(scope="session")
@@ -74,9 +74,12 @@ async def fake_scheduler() -> AsyncGenerator[Scheduler, None]:
     scheduler_jobstore = SQLAlchemyJobStore(f"sqlite:///{sqlite_file_path}")
     scheduler.add_jobstore(scheduler_jobstore)
     yield scheduler
-    scheduler.shutdown(wait=False)
-    scheduler.remove_jobstore("default")
-    os.remove(sqlite_file_path)
+    try:
+        scheduler.shutdown()
+        scheduler.remove_jobstore("default")
+        os.remove(sqlite_file_path)
+    except* (AttributeError, FileNotFoundError):
+        pass
 
 
 @pytest_asyncio.fixture(scope="session")

@@ -2,13 +2,13 @@ import json
 from datetime import timedelta
 from typing import Any
 
-from kwork import Kwork
-from kwork.types import Actor, Category
-from kwork.types.category import Subcategory
 from pydantic import BaseModel
-from redis.asyncio import Redis
-from redis.asyncio.connection import ConnectionPool
+from redis.asyncio.client import Redis
 
+from kwork_parser_bot.services.kwork.kwork import Kwork
+from kwork_parser_bot.services.kwork.kwork.types import Actor, Category, Project
+from kwork_parser_bot.services.kwork.kwork.types.category import Subcategory
+from kwork_parser_bot.services.redis.lifetime import redis_pool
 from kwork_parser_bot.services.redis.main import cached_data, delete_data, retrieve_data
 
 
@@ -73,25 +73,48 @@ class KworkApi(Kwork):
 
     async def cached_category(
         self,
-        redis_pool: ConnectionPool,
         ex: timedelta = timedelta(days=30),
     ):
         key = self._build_redis_key(self.cached_category.__name__)
         async with Redis(connection_pool=redis_pool) as redis:
-            categories: list[Category] | bytes = await redis.get(key)
-            if not categories:
-                categories: list[Category] = await self.get_categories()
-                await redis.set(key, json.dumps([x.json() for x in categories]), ex=ex)
-                return categories
+            await redis.expire(key, ex)
+            data: list[Category] | bytes = await redis.get(key)
+            if not data:
+                data = await self.get_categories()
+                await redis.set(key, json.dumps([x.json() for x in data]), ex=ex)
+                return data
             else:
-                categories = [
-                    Category(**json.loads(data)) for data in json.loads(categories)
-                ]
-                return categories
+                data = [Category(**json.loads(x)) for x in json.loads(data)]
+                return data
+
+    async def cached_projects(
+        self,
+        user_id: int,
+        categories_ids: list[int],
+        data: list[Project] = None,
+        ex: timedelta = timedelta(days=1),
+        update=False,
+    ):
+        key = self._build_redis_key(
+            f"{self.cached_projects.__name__}:"
+            f"{'-'.join([str(x) for x in categories_ids])}"
+        )
+        async with Redis(connection_pool=redis_pool) as redis:
+            await redis.expire(key, ex)
+            if update:
+                await redis.set(key, json.dumps([x.json() for x in data]), ex=ex)
+            cached_data: list[Project] | bytes = await redis.get(key)
+            if not cached_data and data:
+                await redis.set(key, json.dumps([x.json() for x in data]), ex=ex)
+                return data
+            elif cached_data and not data:
+                return [Project(**json.loads(x)) for x in json.loads(cached_data)]
+            else:
+                return data
 
     @staticmethod
-    def get_parent_category(categories: list[Category | Subcategory], category_id: int):
-        item = list(filter(lambda x: x.id == category_id, categories))
+    def get_parent_category(category: list[Category | Subcategory], category_id: int):
+        item = list(filter(lambda x: x.id == category_id, category))
         if item:
             item = item.pop()
         else:
@@ -99,8 +122,8 @@ class KworkApi(Kwork):
         return item
 
     def get_category(
-        self, categories: list[Category], parent_category_id: int, category_id: int
+        self, category: list[Category], parent_category_id: int, category_id: int
     ):
-        parent_category = self.get_parent_category(categories, parent_category_id)
+        parent_category = self.get_parent_category(category, parent_category_id)
         category = self.get_parent_category(parent_category.subcategories, category_id)
         return category

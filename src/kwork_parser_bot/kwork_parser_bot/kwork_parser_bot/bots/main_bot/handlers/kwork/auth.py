@@ -17,7 +17,8 @@ from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.bots.main_bot.states import KworkAuthState
 from kwork_parser_bot.db.models.kwork_account import KworkAccount
 from kwork_parser_bot.db.session import get_db
-from kwork_parser_bot.services.kwork.base_class import KworkCreds, KworkApi
+from kwork_parser_bot.schemas.pydantic_schema import PydanticKworkAccount
+from kwork_parser_bot.services.kwork.main import KworkCreds, KworkApi
 from kwork_parser_bot.services.kwork.lifetime import get_kwork_api
 
 router = Router(name=__file__)
@@ -27,7 +28,7 @@ async def auth_menu(user: User, state: FSMContext):
     await state.clear()
     message = await main_bot.send_message(
         user.id,
-        "Enter your kwork login.\n" "<b>Attention! Data will be updated</b>",
+        "Enter your kwork login.\n<b>Attention! Data will be updated</b>",
         reply_markup=auth_keyboard_builder().as_markup(),
     )
     await state.update_data(
@@ -130,23 +131,19 @@ async def auth_phone(message: Message, state: FSMContext):
         process_phone_input(message, state, creds)
 
     async def create_account(user: User, creds):
-        kwork_account = KworkAccount(
-            telegram_id=message.from_user.id,
+        kwork_account = PydanticKworkAccount(
+            telegram_id=user.id,
             login=creds.login,
             password=KworkAccount.get_hashed_password(creds.password),
             phone=creds.phone,
         )
-        try:
-            async with get_db() as db:
-                db.add(kwork_account)
-        except:
-            async with get_db() as db:
-                stmt = (
-                    update(KworkAccount)
-                    .where(KworkAccount.telegram_id == user.id)
-                    .values(**kwork_account.__dict__)
-                )
-                await db.execute(stmt)
+        async with get_db() as db:
+            stmt = (
+                update(KworkAccount)
+                .where(KworkAccount.telegram_id == user.id)
+                .values(**kwork_account.dict())
+            )
+            await db.execute(stmt)
 
     await state.update_data(creds=creds.dict())
     await creds.set_cache(message.from_user.id, creds.dict())

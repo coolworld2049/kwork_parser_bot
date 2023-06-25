@@ -2,9 +2,9 @@ import asyncio
 from datetime import timedelta
 
 import pytest
-from kwork.types import Actor
+from kwork_parser_bot.services.kwork.kwork.types import Actor
 
-from kwork_parser_bot.services.kwork.base_class import KworkCreds, KworkApi
+from kwork_parser_bot.services.kwork.main import KworkCreds, KworkApi
 from kwork_parser_bot.services.kwork.lifetime import get_kwork_api
 
 

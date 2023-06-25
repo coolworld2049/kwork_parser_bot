@@ -9,9 +9,9 @@ class KworkAccount(Base, TimestampsMixin):
         sa.BigInteger, sa.Sequence("kwork_account_seq_id"), autoincrement=True
     )
     telegram_id = sa.Column(sa.ForeignKey("bot_user.id"), primary_key=True)
-    login = sa.Column(sa.String, nullable=False, unique=True)
-    password = sa.Column(sa.String, nullable=False)
-    phone = sa.Column(sa.String, nullable=False)
+    login = sa.Column(sa.String, unique=True)
+    password = sa.Column(sa.String)
+    phone = sa.Column(sa.String)
 
     @staticmethod
     def get_hashed_password(plain_text_password):

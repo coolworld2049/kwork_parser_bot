@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import pytz
-from kwork.types import Project
+from kwork_parser_bot.services.kwork.kwork.types import Project
 
 from kwork_parser_bot.core.config import get_app_settings
 

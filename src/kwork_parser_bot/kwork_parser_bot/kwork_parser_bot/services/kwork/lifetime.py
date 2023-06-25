@@ -3,7 +3,7 @@ from typing import AsyncGenerator
 
 from loguru import logger
 
-from kwork_parser_bot.services.kwork.base_class import KworkApi, KworkCreds
+from kwork_parser_bot.services.kwork.main import KworkApi, KworkCreds
 
 
 @asynccontextmanager

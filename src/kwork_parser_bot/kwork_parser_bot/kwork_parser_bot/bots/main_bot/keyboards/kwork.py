@@ -2,8 +2,8 @@ from typing import Optional
 
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from kwork.types import Category
-from kwork.types.category import Subcategory
+from kwork_parser_bot.services.kwork.kwork.types import Category
+from kwork_parser_bot.services.kwork.kwork.types.category import Subcategory
 
 from kwork_parser_bot.bots.main_bot.callbacks import KworkCategoryCallback, MenuCallback
 

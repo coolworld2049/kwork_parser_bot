@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from kwork_parser_bot.db.models.kwork_account import KworkAccount
 from kwork_parser_bot.db.session import get_db
-from kwork_parser_bot.services.kwork.base_class import KworkCreds, KworkApi
+from kwork_parser_bot.services.kwork.main import KworkCreds, KworkApi
 
 
 class ServicesMiddleware(BaseMiddleware):

@@ -62,4 +62,8 @@ services:
 
 volumes:
   redis-data:
+    labels:
+      keep:
   postgres-data:
+    labels:
+      keep:

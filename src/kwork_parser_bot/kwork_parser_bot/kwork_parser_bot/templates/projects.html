@@ -1,6 +1,6 @@
-🔔 New projects found at
+🔔 <b><code>{{ job.name }}</code></b>
 Job id — <code>{{ job.id }}</code>
-Category — <b><code>{{ job.name }}</code></b>
+Next run time — <b><code>{{ job.next_run_time }}</code></b>
 {% for project in projects %}
 {{loop.index}}. <a href="{{ project.project_url }}">{{project.title}}</a>
 Price — {{project.price}}

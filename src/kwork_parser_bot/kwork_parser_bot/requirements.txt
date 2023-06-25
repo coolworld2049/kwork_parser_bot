@@ -6,7 +6,6 @@ loguru
 jinja2
 stringcase
 py-bcrypt
-kwork
 apscheduler
 cron-validator
 sqlalchemy==2.0.17

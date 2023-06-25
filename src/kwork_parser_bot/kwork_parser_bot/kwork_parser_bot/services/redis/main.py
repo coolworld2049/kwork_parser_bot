@@ -11,7 +11,7 @@ from kwork_parser_bot.services.redis.lifetime import redis_pool
 
 async def cached_data(
     func: typing.Any = None,
-    data: dict = None,
+    data: typing.Any | dict = None,
     *,
     key: str = None,
     ex: int | timedelta = timedelta(days=1),
@@ -30,13 +30,14 @@ async def cached_data(
                         data = await func()
                     else:
                         data = func()
-                    data = data.dict() if not isinstance(data, dict) else None
-                await redis.set(key, json.dumps(data), ex=ex)
+                data = json.dumps(data)
+                await redis.set(key, data, ex=ex)
                 return data
             else:
                 return json.loads(cache_data)
     except Exception as e:
         logger.debug(e.args)
+        return data
 
 
 async def retrieve_data(key: str):

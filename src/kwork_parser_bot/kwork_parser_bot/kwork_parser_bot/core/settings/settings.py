@@ -18,12 +18,14 @@ class SchedulerSettings(BaseAppSettings):
 
 
 class MainBotSettings(SchedulerSettings):
-    BOT_OWNER_ID: int = 1070277776
+    BOT_OWNER_ID: int
+    BOT_SUPPORT_USERNAME: Optional[str]
     BOT_TOKEN: str
     BOT_COMMANDS: list[BotCommand] = [
         BotCommand(command="/start", description="start the main_bot"),
     ]
-    BOT_SUPPORT: Optional[str] = "https://t.me/kworkAdsParserSupport"
+    BOT_SUPPORT: Optional[str] = f"https://t.me/{os.getenv('BOT_SUPPORT_USERNAME')}"
+    NOTIFICATION_CHANNEL_ID: Optional[int] = None
 
 
 class RedisSettings(BaseAppSettings):

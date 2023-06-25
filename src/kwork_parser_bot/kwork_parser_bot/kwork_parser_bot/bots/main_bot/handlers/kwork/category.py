@@ -20,7 +20,7 @@ from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.bots.main_bot.states import SchedulerState
 from kwork_parser_bot.core.config import get_app_settings
 from kwork_parser_bot.schemas.kwork.schedjob import SchedJob
-from kwork_parser_bot.services.kwork.base_class import KworkApi
+from kwork_parser_bot.services.kwork.main import KworkApi
 
 router = Router(name=__file__)
 
@@ -37,7 +37,7 @@ async def category_menu(
     if not kwork_api:
         await query.answer("Bad kwork credentials")
         return None
-    category = await kwork_api.cached_category(redis_pool)
+    category = await kwork_api.cached_category()
     builder = category_keyboard_builder(category, callback_name="subcategory")
     builder = menu_navigation_keyboard_builder(
         builder,
@@ -60,7 +60,7 @@ async def subcategory(
     kwork_api: KworkApi,
     redis_pool: ConnectionPool,
 ):
-    category = await kwork_api.cached_category(redis_pool)
+    category = await kwork_api.cached_category()
     builder = category_keyboard_builder(
         category, callback_data.category_id, callback_name="scheduler-job"
     )
@@ -92,7 +92,7 @@ async def subcategory_sched_job(
     if not all([category_id, subcategory_id]):
         logger.debug(all([category_id, subcategory_id]))
         return None
-    category = await kwork_api.cached_category(redis_pool)
+    category = await kwork_api.cached_category()
     parent_category = kwork_api.get_parent_category(category, category_id)
     category = kwork_api.get_category(category, parent_category.id, subcategory_id)
 
@@ -113,7 +113,9 @@ async def subcategory_sched_job(
             args=(
                 kwork_api.creds,
                 query.from_user.id,
-                query.from_user.id,
+                get_app_settings().NOTIFICATION_CHANNEL_ID
+                if get_app_settings().NOTIFICATION_CHANNEL_ID
+                else query.from_user.id,
                 [category_id],
                 notify_about_new_projects_callback.pack(),
             ),

@@ -5,8 +5,8 @@ import pytz
 from loguru import logger
 
 from kwork_parser_bot.core.config import get_app_settings
-from kwork_parser_bot.services.kwork.base_class import KworkCreds
-from kwork_parser_bot.services.scheduler.base_class import Scheduler
+from kwork_parser_bot.services.kwork.main import KworkCreds
+from kwork_parser_bot.services.scheduler.main import Scheduler
 from kwork_parser_bot.services.scheduler.jobs import (
     notify_about_kwork_notifications,
     notify_about_new_projects,
@@ -28,14 +28,15 @@ async def test_scheduler(fake_scheduler: Scheduler):
 
 
 @pytest.mark.asyncio
-async def test_scheduler_jobs(kwork_creds: KworkCreds):
-    await notify_about_kwork_notifications(
+async def test_scheduler_jobs(fake_scheduler: Scheduler, kwork_creds: KworkCreds):
+    notifications = await notify_about_kwork_notifications(
         kwork_creds.dict(),
         get_app_settings().BOT_OWNER_ID,
         get_app_settings().BOT_OWNER_ID,
         send_message=False,
     )
-    await notify_about_new_projects(
+    assert len(notifications) > 0
+    projects = await notify_about_new_projects(
         kwork_creds.dict(),
         get_app_settings().BOT_OWNER_ID,
         get_app_settings().BOT_OWNER_ID,
@@ -43,3 +44,4 @@ async def test_scheduler_jobs(kwork_creds: KworkCreds):
         job_id=None,
         send_message=False,
     )
+    assert len(projects) > 0

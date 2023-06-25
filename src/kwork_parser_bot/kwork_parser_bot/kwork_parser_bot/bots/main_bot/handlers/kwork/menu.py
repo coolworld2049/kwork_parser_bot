@@ -20,8 +20,10 @@ from kwork_parser_bot.bots.main_bot.keyboards.scheduler import (
 from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.bots.main_bot.states import SchedulerState, KworkAuthState
 from kwork_parser_bot.core.config import get_app_settings
+from kwork_parser_bot.db.models.kwork_account import KworkAccount
+from kwork_parser_bot.db.session import get_db
 from kwork_parser_bot.schemas.kwork.schedjob import SchedJob
-from kwork_parser_bot.services.kwork.base_class import KworkApi
+from kwork_parser_bot.services.kwork.main import KworkApi
 from kwork_parser_bot.template_engine import render_template
 
 router = Router(name=__file__)
@@ -29,6 +31,9 @@ router = Router(name=__file__)
 
 @router.callback_query(MenuCallback.filter(F.name == "kwork"))
 async def kwork_menu(query: CallbackQuery, state: FSMContext, kwork_api: KworkApi):
+    async with get_db() as db:
+        kwork_account = KworkAccount(telegram_id=query.from_user.id)
+        db.add(kwork_account, _warn=False)
     if not kwork_api:
         await state.set_state(KworkAuthState.set_login)
         await query.message.delete()
@@ -51,7 +56,9 @@ async def kwork_menu(query: CallbackQuery, state: FSMContext, kwork_api: KworkAp
                 args=(
                     kwork_api.creds,
                     query.from_user.id,
-                    query.from_user.id,
+                    get_app_settings().NOTIFICATION_CHANNEL_ID
+                    if get_app_settings().NOTIFICATION_CHANNEL_ID
+                    else query.from_user.id,
                 ),
             )
         ]

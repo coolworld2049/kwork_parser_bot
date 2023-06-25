@@ -17,7 +17,6 @@ from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.bots.main_bot.states import KworkAuthState
 from kwork_parser_bot.db.models.kwork_account import KworkAccount
 from kwork_parser_bot.db.session import get_db
-from kwork_parser_bot.schemas.pydantic_schema import PydanticKworkAccount
 from kwork_parser_bot.services.kwork.lifetime import get_kwork_api
 from kwork_parser_bot.services.kwork.main import KworkCreds, KworkApi
 
@@ -131,17 +130,19 @@ async def auth_phone(message: Message, state: FSMContext):
         process_phone_input(message, state, creds)
 
     async def create_account(user: User, creds):
-        kwork_account = PydanticKworkAccount(
+        kwork_account = KworkAccount(
             telegram_id=user.id,
             login=creds.login,
             password=KworkAccount.get_hashed_password(creds.password),
             phone=creds.phone,
         )
+        kwork_account_data = kwork_account.__dict__
+        kwork_account_data.pop("_sa_instance_state")
         async with get_db() as db:
             stmt = (
                 update(KworkAccount)
                 .where(KworkAccount.telegram_id == user.id)
-                .values(**kwork_account.dict())
+                .values(**kwork_account_data)
             )
             await db.execute(stmt)
 

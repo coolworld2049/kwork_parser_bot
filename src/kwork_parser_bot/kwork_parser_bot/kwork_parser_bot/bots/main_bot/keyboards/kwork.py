@@ -2,10 +2,14 @@ from typing import Optional
 
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+from kwork_parser_bot.bots.main_bot.callbacks import (
+    KworkCategoryCallback,
+    MenuCallback,
+    BlacklistCallback,
+)
 from kwork_parser_bot.services.kwork.kwork.types import Category
 from kwork_parser_bot.services.kwork.kwork.types.category import Subcategory
-
-from kwork_parser_bot.bots.main_bot.callbacks import KworkCategoryCallback, MenuCallback
 
 
 def kwork_menu_keyboard_builder():
@@ -29,6 +33,10 @@ def kwork_menu_keyboard_builder():
         InlineKeyboardButton(
             text="🔎 Category",
             callback_data=MenuCallback(name="category").pack(),
+        ),
+        InlineKeyboardButton(
+            text="🚫 Blacklist",
+            callback_data=MenuCallback(name="blacklist").pack(),
         ),
     )
     return builder
@@ -80,4 +88,19 @@ def category_keyboard_builder(
             )
         )
     builder.adjust(1)
+    return builder
+
+
+def blacklist_menu_keyboard_builder():
+    builder = InlineKeyboardBuilder()
+    builder.add(
+        InlineKeyboardButton(
+            text="add",
+            callback_data=BlacklistCallback(name="blacklist", action="add").pack(),
+        ),
+        InlineKeyboardButton(
+            text="delete",
+            callback_data=BlacklistCallback(name="blacklist", action="rm").pack(),
+        ),
+    )
     return builder

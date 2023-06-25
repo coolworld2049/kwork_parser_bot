@@ -18,8 +18,8 @@ from kwork_parser_bot.bots.main_bot.states import KworkAuthState
 from kwork_parser_bot.db.models.kwork_account import KworkAccount
 from kwork_parser_bot.db.session import get_db
 from kwork_parser_bot.schemas.pydantic_schema import PydanticKworkAccount
-from kwork_parser_bot.services.kwork.main import KworkCreds, KworkApi
 from kwork_parser_bot.services.kwork.lifetime import get_kwork_api
+from kwork_parser_bot.services.kwork.main import KworkCreds, KworkApi
 
 router = Router(name=__file__)
 
@@ -55,7 +55,7 @@ async def auth_cancel_message(message: Message, state: FSMContext):
 
 
 @router.callback_query(
-    MenuCallback.filter(F.name == "kwork-login" and F.action == "rm")
+    MenuCallback.filter(F.name == "kwork-login"), MenuCallback.filter(F.action == "rm")
 )
 async def auth_cancel_callback(query: CallbackQuery, state: FSMContext):
     await query.message.delete()

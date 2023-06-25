@@ -12,7 +12,10 @@ from kwork_parser_bot.services.scheduler.lifetime import scheduler
 router = Router(name=__file__)
 
 
-@router.callback_query(SchedulerCallback.filter(F.action == "rm"))
+@router.callback_query(
+    SchedulerCallback.filter(F.name == "job"),
+    SchedulerCallback.filter(F.action == "rm"),
+)
 async def scheduler_remove_job_process(
     query: CallbackQuery, callback_data: SchedulerCallback, state: FSMContext
 ):

@@ -10,7 +10,7 @@ def scheduler_menu_keyboard_builder():
     builder.add(
         InlineKeyboardButton(
             text="🗑️ Remove",
-            callback_data=SchedulerCallback(action="rm").pack(),
+            callback_data=SchedulerCallback(name="job", action="rm").pack(),
         )
     )
     return builder

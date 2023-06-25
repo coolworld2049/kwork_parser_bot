@@ -6,6 +6,13 @@ class CategoryState(StatesGroup):
     select_subcategory = State()
 
 
+class KworkAuthState(StatesGroup):
+    start = State()
+    set_login = State()
+    set_password = State()
+    set_phone = State()
+
+
 class SchedulerState(StatesGroup):
     select_action = State()
     add_job_process_input = State()
@@ -13,8 +20,6 @@ class SchedulerState(StatesGroup):
     remove_job = State()
 
 
-class KworkAuthState(StatesGroup):
-    start = State()
-    set_login = State()
-    set_password = State()
-    set_phone = State()
+class BlacklistState(StatesGroup):
+    add_process_input = State()
+    manage = State()

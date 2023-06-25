@@ -15,8 +15,6 @@ async def notify_about_kwork_notifications(
     async with get_kwork_api(KworkCreds(**kwork_creds)) as kwork_api:
         notifications = await kwork_api.get_notifications()
         assert notifications, f"kwork_api.get_notifications():{notifications}"
-        if not notifications.get("response"):
-            return None
         if send_message:
             await main_bot.send_message(
                 chat_id,

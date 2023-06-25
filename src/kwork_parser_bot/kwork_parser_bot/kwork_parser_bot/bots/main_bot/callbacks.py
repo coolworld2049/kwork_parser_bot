@@ -25,3 +25,8 @@ class SchedulerCallback(CallbackData, prefix="scheduler"):
     category_id: int | None
     subcategory_id: int | None
     from_: str | None
+
+
+class BlacklistCallback(CallbackData, prefix="blacklist"):
+    name: str | None
+    action: str | None

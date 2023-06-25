@@ -1,10 +1,17 @@
-from loguru import logger
+import json
 
+from loguru import logger
+from redis.asyncio.client import Redis
+
+from kwork_parser_bot.bots.main_bot.handlers.kwork.blacklist.menu import (
+    blacklist_redis_key_prefix,
+)
 from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.schemas.kwork.project import ProjectExtended
 from kwork_parser_bot.services.kwork.kwork.types import Project
 from kwork_parser_bot.services.kwork.lifetime import get_kwork_api
 from kwork_parser_bot.services.kwork.main import KworkCreds
+from kwork_parser_bot.services.redis.lifetime import redis_pool
 from kwork_parser_bot.services.scheduler.lifetime import scheduler
 from kwork_parser_bot.template_engine import render_template
 
@@ -22,6 +29,12 @@ async def notify_about_new_projects(
     rendered = None
     job = scheduler.get_job(job_id)
     projects = []
+    async with Redis(connection_pool=redis_pool) as redis:
+        blacklist = await redis.get(f"{blacklist_redis_key_prefix}:{user_id}")
+        if blacklist:
+            blacklist = json.loads(blacklist)
+        else:
+            blacklist = {"data": []}
     async with get_kwork_api(KworkCreds(**kwork_creds)) as api:
         old_projects: list[Project] = await api.cached_projects(user_id, categories_ids)
         new_projects: list[Project] = await api.get_projects(categories_ids)
@@ -32,7 +45,8 @@ async def notify_about_new_projects(
             new_projects: list[Project | None] = list(
                 filter(
                     lambda x: x
-                    if x.id in projects_diff_ids and not x.is_viewed
+                    if x.id in projects_diff_ids
+                    and x.username not in blacklist.get("data")
                     else None,
                     new_projects,
                 )

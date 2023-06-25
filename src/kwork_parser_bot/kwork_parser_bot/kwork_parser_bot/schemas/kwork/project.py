@@ -1,9 +1,9 @@
 from datetime import datetime
 
 import pytz
-from kwork_parser_bot.services.kwork.kwork.types import Project
 
 from kwork_parser_bot.core.config import get_app_settings
+from kwork_parser_bot.services.kwork.kwork.types import Project
 
 
 class ProjectExtended(Project):
@@ -28,7 +28,3 @@ class ProjectExtended(Project):
     @property
     def date_confirm_time(self):
         return self.date_confirm_datetime.time()
-
-    @property
-    def project_url(self):
-        return f"https://kwork.ru/projects/{self.id}/view"

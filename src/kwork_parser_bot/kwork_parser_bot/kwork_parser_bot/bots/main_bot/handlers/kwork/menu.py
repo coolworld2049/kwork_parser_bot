@@ -47,7 +47,7 @@ async def kwork_menu(query: CallbackQuery, state: FSMContext, kwork_api: KworkAp
     if kwork_api:
         sched_jobs = [
             SchedJob(
-                text="🔔 Receive account notifications",
+                text="🔔 Receive notifications",
                 callback=SchedulerCallback(
                     name="job", action="add", user_id=query.from_user.id, from_="kwork"
                 ),

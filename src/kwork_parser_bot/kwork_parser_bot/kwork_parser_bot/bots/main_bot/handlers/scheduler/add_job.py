@@ -23,7 +23,8 @@ router = Router(name=__file__)
 
 
 @router.callback_query(
-    SchedulerCallback.filter(F.name == "job" and F.action == "add"),
+    SchedulerCallback.filter(F.name == "job"),
+    SchedulerCallback.filter(F.action == "add"),
     SchedulerState.add_job_process_input,
 )
 async def scheduler_add_job_trigger_process(

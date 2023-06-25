@@ -7,6 +7,7 @@ from kwork_parser_bot.bots.main_bot.handlers import (
     menu,
     kwork,
 )
+from kwork_parser_bot.bots.main_bot.handlers.kwork import blacklist
 from kwork_parser_bot.bots.main_bot.loader import main_bot
 from kwork_parser_bot.core.config import get_app_settings
 from kwork_parser_bot.services.redis.lifetime import init_redis, shutdown_redis
@@ -32,6 +33,7 @@ async def startup(dp: Dispatcher) -> None:
         scheduler.menu.router,
         scheduler.add_job.router,
         scheduler.remove_job.router,
+        blacklist.menu.router,
     )
 
 

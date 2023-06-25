@@ -2,9 +2,10 @@
 Job id — <code>{{ job.id }}</code>
 Next run time — <b><code>{{ job.next_run_time }}</code></b>
 {% for project in projects %}
-{{loop.index}}. <a href="{{ project.project_url }}">{{project.title}}</a>
+{{loop.index}}. <a href="https://kwork.ru/{{project.id}}/view">{{project.title}}</a>
 Price — {{project.price}}
 Offers — {{project.offers}}
 Time left — {{project.time_left_time}}
 Date confirm — {{project.date_confirm_datetime}}
+Username — <a href="https://kwork.ru/user/{{ project.username }}">{{project.username}}</a>
 {% endfor %}

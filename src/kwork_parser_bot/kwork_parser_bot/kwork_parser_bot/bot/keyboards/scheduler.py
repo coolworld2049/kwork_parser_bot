@@ -17,15 +17,14 @@ def scheduler_menu_keyboard_builder():
 
 
 def scheduler_jobs_keyboard_builder(
-    sched_jobs: list[SchedulerJob],
+    sched_job: SchedulerJob,
 ):
     builder = InlineKeyboardBuilder()
-    for sched_job in sched_jobs:
-        builder.add(
-            InlineKeyboardButton(
-                text=sched_job.text,
-                callback_data=sched_job.callback.pack(),
-            )
+    builder.add(
+        InlineKeyboardButton(
+            text=sched_job.text,
+            callback_data=sched_job.callback.pack(),
         )
+    )
     builder.adjust(1)
     return builder

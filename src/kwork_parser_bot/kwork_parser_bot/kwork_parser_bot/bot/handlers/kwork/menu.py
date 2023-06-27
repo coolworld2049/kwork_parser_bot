@@ -19,11 +19,11 @@ from kwork_parser_bot.bot.keyboards.scheduler import (
 )
 from kwork_parser_bot.bot.loader import main_bot
 from kwork_parser_bot.bot.states import SchedulerState, AuthState
-from kwork_parser_bot.template_engine import render_template
 from kwork_parser_bot.services.kwork.kwork import KworkApi
 from kwork_parser_bot.services.kwork.schemas import KworkActor, KworkAccount
 from kwork_parser_bot.services.scheduler.schemas import SchedulerJob
 from kwork_parser_bot.settings import settings
+from kwork_parser_bot.template_engine import render_template
 
 router = Router(name=__file__)
 
@@ -44,25 +44,23 @@ async def kwork_menu(query: CallbackQuery, state: FSMContext, kwork_api: KworkAp
         await kwork_account.update(actor=actor)
     builder = kwork_menu_keyboard_builder()
     if kwork_api:
-        sched_jobs = [
-            SchedulerJob(
-                text="🔔 Receive notifications",
-                callback=SchedulerCallback(
-                    name="job", action="add", user_id=query.from_user.id, from_="api"
-                ),
-                name="kwork_account",
-                func=f"{settings().SCHED_JOBS_MODULE}:notify_about_kwork_notifications",
-                args=(
-                    kwork_api.kwork_account,
-                    query.from_user.id,
-                    settings().NOTIFICATION_CHANNEL_ID
-                    if settings().NOTIFICATION_CHANNEL_ID
-                    else query.from_user.id,
-                ),
-            )
-        ]
-        await state.update_data(sched_jobs=[x.dict() for x in sched_jobs])
-        builder_sched_jobs = scheduler_jobs_keyboard_builder(sched_jobs)
+        sched_job = SchedulerJob(
+            text="🔔 Receive notifications",
+            callback=SchedulerCallback(
+                name="job", action="add", user_id=query.from_user.id, from_="api"
+            ),
+            name="kwork_account",
+            func=f"{settings().SCHED_JOBS_MODULE}:notify_about_kwork_notifications",
+            args=(
+                kwork_api.kwork_account,
+                query.from_user.id,
+                settings().NOTIFICATION_CHANNEL_ID
+                if settings().NOTIFICATION_CHANNEL_ID
+                else query.from_user.id,
+            ),
+        )
+        await state.update_data(sched_job=sched_job.dict())
+        builder_sched_jobs = scheduler_jobs_keyboard_builder(sched_job)
         builder.add(*list(builder_sched_jobs.buttons))
         builder.adjust(2, 1, repeat=True)
     else:

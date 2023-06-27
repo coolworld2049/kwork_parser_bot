@@ -17,4 +17,3 @@ pytest-asyncio
 aiohttp
 websockets
 redis-om
-aiohttp_socks

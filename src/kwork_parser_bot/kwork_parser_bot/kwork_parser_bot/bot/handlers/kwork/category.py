@@ -100,24 +100,22 @@ async def subcategory_sched_job(
         user_id=query.from_user.id,
         from_="category",
     )
-    sched_jobs = [
-        SchedulerJob(
-            text="🆕 Notify about new projects",
-            callback=notify_about_new_projects_callback,
-            name=f"{parent_category.name}-{category.name}",
-            func=f"{settings().SCHED_JOBS_MODULE}:notify_about_new_projects",
-            args=(
-                kwork_api.kwork_account,
-                query.from_user.id,
-                settings().NOTIFICATION_CHANNEL_ID
-                if settings().NOTIFICATION_CHANNEL_ID
-                else query.from_user.id,
-                [subcategory_id],
-                notify_about_new_projects_callback.pack(),
-            ),
-        )
-    ]
-    builder = scheduler_jobs_keyboard_builder(sched_jobs)
+    sched_job = SchedulerJob(
+        text="🆕 Notify about new projects",
+        callback=notify_about_new_projects_callback,
+        name=f"{parent_category.name}-{category.name}",
+        func=f"{settings().SCHED_JOBS_MODULE}:notify_about_new_projects",
+        args=(
+            kwork_api.kwork_account,
+            query.from_user.id,
+            settings().NOTIFICATION_CHANNEL_ID
+            if settings().NOTIFICATION_CHANNEL_ID
+            else query.from_user.id,
+            [subcategory_id],
+            notify_about_new_projects_callback.pack(),
+        ),
+    )
+    builder = scheduler_jobs_keyboard_builder(sched_job)
     builder = menu_navigation_keyboard_builder(
         builder,
         back_callback=KworkCategoryCallback(
@@ -133,7 +131,7 @@ async def subcategory_sched_job(
         reply_markup=builder.as_markup(),
     )
     await state.update_data(
-        sched_jobs=[x.dict() for x in sched_jobs], subcategory_id=subcategory_id
+        sched_job=sched_job.dict(), subcategory_id=subcategory_id
     )
     await state.set_state(SchedulerState.add_job_process_input)
     await query.message.delete()

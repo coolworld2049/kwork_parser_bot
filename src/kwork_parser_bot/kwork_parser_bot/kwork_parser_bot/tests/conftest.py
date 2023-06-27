@@ -11,17 +11,21 @@ from fakeredis import FakeServer
 from fakeredis.aioredis import FakeConnection
 from redis.asyncio import ConnectionPool
 
+from kwork_parser_bot.bot.dispatcher import dp
+from kwork_parser_bot.bot.main import startup, shutdown
 from kwork_parser_bot.services.kwork.schemas import KworkAccount
 from kwork_parser_bot.services.scheduler.scheduler import Scheduler
 from kwork_parser_bot.settings import settings
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def event_loop():
     loop = asyncio.get_event_loop()
     try:
+        loop.run_until_complete(startup(dp))
         yield loop
     finally:
+        loop.run_until_complete(shutdown(dp))
         loop.close()
 
 
@@ -54,7 +58,7 @@ async def fake_scheduler() -> AsyncGenerator[Scheduler, None]:
     scheduler.add_jobstore(scheduler_jobstore)
     yield scheduler
     try:
-        scheduler.shutdown()
+        scheduler.shutdown(wait=False)
         scheduler.remove_jobstore("default")
         os.remove(sqlite_file_path)
     except* (AttributeError, FileNotFoundError):

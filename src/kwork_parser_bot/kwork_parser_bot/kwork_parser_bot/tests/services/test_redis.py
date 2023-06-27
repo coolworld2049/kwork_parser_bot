@@ -7,7 +7,7 @@ from redis.asyncio.connection import ConnectionPool
 
 
 @pytest.mark.asyncio
-async def test_redis_pool(fake_redis_pool: ConnectionPool):
+async def test_redis_pool(event_loop, fake_redis_pool: ConnectionPool):
     async with Redis(connection_pool=fake_redis_pool) as redis:
         key = "test_redis_pool"
         data = {"test": "test"}

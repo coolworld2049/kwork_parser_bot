@@ -25,7 +25,7 @@ async def notify_about_new_projects(
     if not chat_id:
         chat_id = user_id
     rendered = None
-    job = scheduler.get_job(job_id)
+    job = scheduler.get_job(job_id) if job_id else None
     projects = []
     old_projects = []
     try:
@@ -36,11 +36,15 @@ async def notify_about_new_projects(
         blacklist = Blacklist(telegram_user_id=user_id)
 
     async with get_kwork_api(KworkAccount(**kwork_account)) as api:
-        cached_projects = await api.cached_projects(redis_pool, subcategories_ids, ex=ex)
+        cached_projects = await api.cached_projects(
+            redis_pool, subcategories_ids, ex=ex
+        )
         if cached_projects:
             if len(cached_projects) > 100:
                 cached_projects = []
-            old_projects: list[Project] = cached_projects
+            old_projects: list[Project] = list(
+                filter(lambda x: Project(id=x.id, username=x.username), cached_projects)
+            )
         new_projects: list[Project] = await api.get_projects(subcategories_ids)
 
         def log_msg(*args):
@@ -59,7 +63,7 @@ async def notify_about_new_projects(
             )
             new_projects: list[Project | None] = list(
                 filter(
-                    lambda x: x
+                    lambda x: Project(id=x.id, username=x.username)
                     if x.id in projects_diff_ids
                     and x.username not in blacklist.usernames
                     else None,

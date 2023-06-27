@@ -20,7 +20,7 @@ async def fake_job():
 
 
 @pytest.mark.asyncio
-async def test_scheduler(fake_scheduler: Scheduler):
+async def test_scheduler(event_loop, fake_scheduler: Scheduler):
     fake_scheduler.start()
     datetime_now = datetime.now(tz=pytz.timezone(settings().TIMEZONE))
     job = fake_scheduler.add_job(fake_job, "interval", seconds=4, id=fake_job.__name__)
@@ -28,7 +28,9 @@ async def test_scheduler(fake_scheduler: Scheduler):
 
 
 @pytest.mark.asyncio
-async def test_scheduler_jobs(fake_scheduler: Scheduler, kwork_account: KworkAccount):
+async def test_scheduler_jobs(
+    event_loop, fake_scheduler: Scheduler, kwork_account: KworkAccount
+):
     notifications = await notify_about_kwork_notifications(
         kwork_account.dict(),
         settings().BOT_OWNER_ID,

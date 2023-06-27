@@ -6,6 +6,7 @@ from typing import AsyncGenerator
 import pytest
 import pytest_asyncio
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from aredis_om import Migrator
 from fakeredis import FakeServer
 from fakeredis.aioredis import FakeConnection
 from redis.asyncio import ConnectionPool
@@ -40,6 +41,7 @@ async def fake_redis_pool() -> AsyncGenerator[ConnectionPool, None]:
     server = FakeServer()
     server.connected = True
     pool = ConnectionPool(connection_class=FakeConnection, server=server)
+    await Migrator().run()
     yield pool
     await pool.disconnect()
 

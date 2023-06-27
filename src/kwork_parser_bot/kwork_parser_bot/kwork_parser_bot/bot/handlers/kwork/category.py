@@ -130,8 +130,6 @@ async def subcategory_sched_job(
         text="🤖 Scheduler jobs menu 🤖",
         reply_markup=builder.as_markup(),
     )
-    await state.update_data(
-        sched_job=sched_job.dict(), subcategory_id=subcategory_id
-    )
+    await state.update_data(sched_job=sched_job.dict(), subcategory_id=subcategory_id)
     await state.set_state(SchedulerState.add_job_process_input)
     await query.message.delete()

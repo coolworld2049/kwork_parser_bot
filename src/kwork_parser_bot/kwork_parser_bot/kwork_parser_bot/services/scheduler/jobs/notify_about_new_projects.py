@@ -1,8 +1,8 @@
 from aredis_om import NotFoundError
 from loguru import logger
+from redis.exceptions import ResponseError
 
 from kwork_parser_bot.bot.loader import main_bot, scheduler, redis_pool
-from kwork_parser_bot.template_engine import render_template
 from kwork_parser_bot.services.kwork.api.types import Project
 from kwork_parser_bot.services.kwork.schemas import (
     KworkProject,
@@ -10,6 +10,7 @@ from kwork_parser_bot.services.kwork.schemas import (
     Blacklist,
 )
 from kwork_parser_bot.services.kwork.session import get_kwork_api
+from kwork_parser_bot.template_engine import render_template
 
 
 async def notify_about_new_projects(
@@ -30,7 +31,7 @@ async def notify_about_new_projects(
         blacklist: Blacklist = await Blacklist.find(
             Blacklist.telegram_user_id == user_id
         ).first()
-    except NotFoundError as e:
+    except* (NotFoundError, ResponseError) as e:
         blacklist = Blacklist(telegram_user_id=user_id)
 
     async with get_kwork_api(KworkAccount(**kwork_account)) as api:

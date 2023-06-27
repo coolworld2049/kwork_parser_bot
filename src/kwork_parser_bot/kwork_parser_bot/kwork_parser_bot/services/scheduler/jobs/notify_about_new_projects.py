@@ -37,6 +37,8 @@ async def notify_about_new_projects(
     async with get_kwork_api(KworkAccount(**kwork_account)) as api:
         cached_projects = await api.cached_projects(redis_pool, subcategories_ids)
         if cached_projects:
+            if len(cached_projects) > 100:
+                cached_projects = []
             old_projects: list[Project] = cached_projects
         new_projects: list[Project] = await api.get_projects(subcategories_ids)
 

@@ -53,11 +53,12 @@ class KworkApi(Kwork):
         key = self._r_key(f"projects:{':'.join([str(x) for x in categories_ids])}")
         async with Redis(connection_pool=redis_pool) as redis:
             await redis.expire(key, ex)
-            cached_data = await redis.get(key)
-            if not cached_data and data:
-                data_json = json.dumps([x.json() for x in data if data])
+            if data:
+                data_json = json.dumps([x.json() for x in data])
                 if update:
                     await redis.set(key, data_json, ex=ex)
+            cached_data = await redis.get(key)
+            if not cached_data and data:
                 await redis.set(key, data_json, ex=ex)
                 return data
             elif cached_data and not data:

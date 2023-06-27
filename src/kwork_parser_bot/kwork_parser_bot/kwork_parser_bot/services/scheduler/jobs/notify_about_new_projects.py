@@ -20,6 +20,7 @@ async def notify_about_new_projects(
     subcategories_ids: int | list[int],
     job_id: str = None,
     send_message: bool = True,
+    ex: int = 43200,
 ):
     if not chat_id:
         chat_id = user_id
@@ -35,7 +36,7 @@ async def notify_about_new_projects(
         blacklist = Blacklist(telegram_user_id=user_id)
 
     async with get_kwork_api(KworkAccount(**kwork_account)) as api:
-        cached_projects = await api.cached_projects(redis_pool, subcategories_ids)
+        cached_projects = await api.cached_projects(redis_pool, subcategories_ids, ex=ex)
         if cached_projects:
             if len(cached_projects) > 100:
                 cached_projects = []
@@ -71,7 +72,7 @@ async def notify_about_new_projects(
         logger.info(log_msg(len(old_projects), len(new_projects)))
         old_projects.extend(new_projects)
         await api.cached_projects(
-            redis_pool, subcategories_ids, old_projects, update=True
+            redis_pool, subcategories_ids, old_projects, update=True, ex=ex
         )
         category = await api.cached_category(redis_pool)
         for p in new_projects:

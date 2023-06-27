@@ -4,13 +4,13 @@ import pytest
 import pytz
 from loguru import logger
 
-from kwork_parser_bot.settings import settings
 from kwork_parser_bot.services.kwork.schemas import KworkAccount
-from kwork_parser_bot.services.scheduler.scheduler import Scheduler
 from kwork_parser_bot.services.scheduler.jobs import (
     notify_about_kwork_notifications,
     notify_about_new_projects,
 )
+from kwork_parser_bot.services.scheduler.scheduler import Scheduler
+from kwork_parser_bot.settings import settings
 
 
 async def fake_job():

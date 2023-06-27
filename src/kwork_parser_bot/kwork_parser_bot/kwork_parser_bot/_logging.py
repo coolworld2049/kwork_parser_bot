@@ -4,7 +4,7 @@ from typing import Any, Union
 
 from loguru import logger
 
-from kwork_parser_bot.core.config import get_app_settings
+from kwork_parser_bot.settings import settings
 
 
 class InterceptHandler(logging.Handler):
@@ -65,32 +65,24 @@ def record_formatter(record: dict[str, Any]) -> str:  # pragma: no cover
 
 
 def configure_logging() -> None:  # pragma: no cover
-    """Configures logging."""
     intercept_handler = InterceptHandler()
-
     logging.basicConfig(handlers=[intercept_handler], level=logging.NOTSET)
-
-    # for logger_name in logging.root.manager.loggerDict:
-    #     if logger_name.startswith("aiogram."):
-    #         # change handler for default uvicorn logger
-    #         logging.getLogger(logger_name).handlers = [intercept_handler]
-
-    # set logs output, level and format
     logger.remove()
-    logger.add(
-        get_app_settings().LOG_FILE_PATH + "/access.log",
-        serialize=False,
-        level=get_app_settings().LOGGING_LEVEL,
-        enqueue=True,
-        backtrace=True,
-        diagnose=True,
-        encoding="UTF-8",
-        rotation="64 MB",
-        retention="14 days",
-        compression="zip",
-    )
+    if settings().LOGGING_LEVEL == "INFO":
+        logger.add(
+            settings().LOG_FILE_PATH + "/access.log",
+            serialize=False,
+            level=settings().LOGGING_LEVEL,
+            enqueue=True,
+            backtrace=True,
+            diagnose=True,
+            encoding="UTF-8",
+            rotation="64 MB",
+            retention="14 days",
+            compression="zip",
+        )
     logger.add(
         sys.stdout,
-        level=get_app_settings().LOGGING_LEVEL,
+        level=settings().LOGGING_LEVEL,
         format=record_formatter,
     )

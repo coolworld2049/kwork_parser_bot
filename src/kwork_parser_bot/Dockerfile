@@ -1,18 +1,14 @@
 FROM python:3.11
 
-COPY kwork_parser_bot/requirements.txt /app/requirements.txt
+COPY kwork_parser_bot/requirements.txt /tmp/
 
-RUN pip install --no-cache-dir -r /app/requirements.txt -U
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 COPY kwork_parser_bot /app
-
-RUN chmod +x /app/prestart.sh && chmod +x /app/start.sh
 
 ENV PYTHONPATH=/app
 
 ENV PYTHONDONTWRITEBYTECODE=1
-
-ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 

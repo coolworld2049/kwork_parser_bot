@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-python kwork_parser_bot/initial_data.py
+pytest kwork_parser_bot/tests -vv --tb=native -l

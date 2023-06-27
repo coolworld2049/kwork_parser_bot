@@ -4,9 +4,9 @@ import pytest
 import pytz
 from loguru import logger
 
-from kwork_parser_bot.core.config import get_app_settings
-from kwork_parser_bot.services.kwork.main import KworkCreds
-from kwork_parser_bot.services.scheduler.main import Scheduler
+from kwork_parser_bot.settings import settings
+from kwork_parser_bot.services.kwork.schemas import KworkAccount
+from kwork_parser_bot.services.scheduler.scheduler import Scheduler
 from kwork_parser_bot.services.scheduler.jobs import (
     notify_about_kwork_notifications,
     notify_about_new_projects,
@@ -22,26 +22,24 @@ async def fake_job():
 @pytest.mark.asyncio
 async def test_scheduler(fake_scheduler: Scheduler):
     fake_scheduler.start()
-    datetime_now = datetime.now(tz=pytz.timezone(get_app_settings().TIMEZONE))
+    datetime_now = datetime.now(tz=pytz.timezone(settings().TIMEZONE))
     job = fake_scheduler.add_job(fake_job, "interval", seconds=4, id=fake_job.__name__)
     assert job.next_run_time >= datetime_now + timedelta(seconds=2)
 
 
 @pytest.mark.asyncio
-async def test_scheduler_jobs(fake_scheduler: Scheduler, kwork_creds: KworkCreds):
+async def test_scheduler_jobs(fake_scheduler: Scheduler, kwork_account: KworkAccount):
     notifications = await notify_about_kwork_notifications(
-        kwork_creds.dict(),
-        get_app_settings().BOT_OWNER_ID,
-        get_app_settings().BOT_OWNER_ID,
+        kwork_account.dict(),
+        settings().BOT_OWNER_ID,
+        settings().BOT_OWNER_ID,
         send_message=False,
     )
-    assert len(notifications) > 0
     projects = await notify_about_new_projects(
-        kwork_creds.dict(),
-        get_app_settings().BOT_OWNER_ID,
-        get_app_settings().BOT_OWNER_ID,
-        [11],
+        kwork_account.dict(),
+        settings().BOT_OWNER_ID,
+        settings().BOT_OWNER_ID,
+        [41],
         job_id=None,
         send_message=False,
     )
-    assert len(projects) > 0

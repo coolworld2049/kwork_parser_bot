@@ -1,26 +1,22 @@
-import json
-
+from aredis_om import NotFoundError
 from loguru import logger
-from redis.asyncio.client import Redis
 
-from kwork_parser_bot.bots.main_bot.handlers.kwork.blacklist.menu import (
-    blacklist_redis_key_prefix,
-)
-from kwork_parser_bot.bots.main_bot.loader import main_bot
-from kwork_parser_bot.schemas.kwork.project import ProjectExtended
-from kwork_parser_bot.services.kwork.kwork.types import Project
-from kwork_parser_bot.services.kwork.lifetime import get_kwork_api
-from kwork_parser_bot.services.kwork.main import KworkCreds
-from kwork_parser_bot.services.redis.lifetime import redis_pool
-from kwork_parser_bot.services.scheduler.lifetime import scheduler
+from kwork_parser_bot.bot.loader import main_bot, scheduler, redis_pool
 from kwork_parser_bot.template_engine import render_template
+from kwork_parser_bot.services.kwork.api.types import Project
+from kwork_parser_bot.services.kwork.schemas import (
+    KworkProject,
+    KworkAccount,
+    Blacklist,
+)
+from kwork_parser_bot.services.kwork.session import get_kwork_api
 
 
 async def notify_about_new_projects(
-    kwork_creds: dict,
+    kwork_account: dict,
     user_id: int,
     chat_id: int | None,
-    categories_ids: int | list[int],
+    subcategories_ids: int | list[int],
     job_id: str = None,
     send_message: bool = True,
 ):
@@ -29,15 +25,30 @@ async def notify_about_new_projects(
     rendered = None
     job = scheduler.get_job(job_id)
     projects = []
-    async with Redis(connection_pool=redis_pool) as redis:
-        blacklist = await redis.get(f"{blacklist_redis_key_prefix}:{user_id}")
-        if blacklist:
-            blacklist = json.loads(blacklist)
-        else:
-            blacklist = {"data": []}
-    async with get_kwork_api(KworkCreds(**kwork_creds)) as api:
-        old_projects: list[Project] = await api.cached_projects(user_id, categories_ids)
-        new_projects: list[Project] = await api.get_projects(categories_ids)
+    old_projects = []
+    try:
+        blacklist: Blacklist = await Blacklist.find(
+            Blacklist.telegram_user_id == user_id
+        ).first()
+    except NotFoundError as e:
+        blacklist = Blacklist(telegram_user_id=user_id)
+
+    async with get_kwork_api(KworkAccount(**kwork_account)) as api:
+        cached_projects = await api.cached_projects(redis_pool, subcategories_ids)
+        if cached_projects:
+            old_projects: list[Project] = cached_projects
+        new_projects: list[Project] = await api.get_projects(subcategories_ids)
+
+        def log_msg(*args):
+            return (
+                f"user_id:{user_id}"
+                f" job_id:{job.id if job else None}"
+                f" job_name:{job.name if job else None}"
+                f" categories_ids:{subcategories_ids}"
+                f" old_projects:{args[0]},"
+                f" new_projects:{args[1]},"
+            )
+
         if old_projects:
             projects_diff_ids = set([x.id for x in new_projects]).difference(
                 set([x.id for x in old_projects])
@@ -46,21 +57,22 @@ async def notify_about_new_projects(
                 filter(
                     lambda x: x
                     if x.id in projects_diff_ids
-                    and x.username not in blacklist.get("data")
+                    and x.username not in blacklist.usernames
                     else None,
                     new_projects,
                 )
             )
             if not len(new_projects) > 0:
-                logger.debug(
-                    f"old_projects:{len(old_projects)},"
-                    f" new_projects:{len(new_projects)},"
-                )
+                logger.info(log_msg(len(old_projects), len(new_projects)))
                 return None
-        await api.cached_projects(user_id, categories_ids, new_projects, update=True)
-        category = await api.cached_category()
+        logger.info(log_msg(len(old_projects), len(new_projects)))
+        old_projects.extend(new_projects)
+        await api.cached_projects(
+            redis_pool, subcategories_ids, old_projects, update=True
+        )
+        category = await api.cached_category(redis_pool)
         for p in new_projects:
-            p = ProjectExtended(**p.dict())
+            p = KworkProject(**p.dict())
             p.category_id = api.get_category(
                 category, p.parent_category_id, p.category_id
             ).name
@@ -79,4 +91,3 @@ async def notify_about_new_projects(
             rendered,
             disable_web_page_preview=True,
         )
-    return projects

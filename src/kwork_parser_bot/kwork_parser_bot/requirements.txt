@@ -5,7 +5,6 @@ pydantic
 loguru
 jinja2
 stringcase
-py-bcrypt
 apscheduler
 cron-validator
 sqlalchemy==2.0.17
@@ -17,3 +16,5 @@ pytest==7.4.0
 pytest-asyncio
 aiohttp
 websockets
+redis-om
+aiohttp_socks

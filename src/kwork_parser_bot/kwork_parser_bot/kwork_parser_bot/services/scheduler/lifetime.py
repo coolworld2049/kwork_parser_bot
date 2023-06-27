@@ -1,16 +1,18 @@
-from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from apscheduler.jobstores.redis import RedisJobStore
 
-from kwork_parser_bot.core.config import get_app_settings
-from kwork_parser_bot.services.scheduler.main import Scheduler
-
-scheduler = Scheduler(timezone=get_app_settings().TIMEZONE)
+from kwork_parser_bot.services.scheduler.scheduler import Scheduler
+from kwork_parser_bot.settings import settings
 
 
-def init_scheduler() -> None:
-    scheduler_jobstore = SQLAlchemyJobStore(get_app_settings().pgbouncer_url)
+def init_scheduler(scheduler: Scheduler) -> None:
+    scheduler_jobstore = RedisJobStore(
+        host=settings().REDIS_MASTER_HOST,
+        port=settings().REDIS_MASTER_PORT_NUMBER,
+        password=settings().REDIS_PASSWORD,
+    )
     scheduler.add_jobstore(scheduler_jobstore)
     scheduler.start()
 
 
-async def shutdown_scheduler() -> None:
-    await scheduler.shutdown(wait=True)
+def shutdown_scheduler(scheduler) -> None:
+    scheduler.shutdown(wait=True)

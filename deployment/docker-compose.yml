@@ -7,63 +7,31 @@ services:
     extends:
       service: kwork_parser_bot
       file: ../src/kwork_parser_bot/docker-compose.yml
-    ports:
-      - '80:80'
     environment:
       - STAGE=prod
     restart: always
 
   redis:
-    image: bitnami/redis:latest
+    image: redis/redis-stack:latest
     ports:
-      - '6379:6379'
-    env_file:
-      - ../src/kwork_parser_bot/.env
+      - "6379:6379"
+      - "8001:8001"
+    environment:
+      - REDIS_ARGS=--save 3600 1 300 100 60 10000
     volumes:
-      - redis-data:/bitnami/redis/data
-    restart: always
+      - redis-data:/data
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
     healthcheck:
       test: redis-cli ping
       interval: 1s
       timeout: 3s
       retries: 50
 
-  postgres:
-    image: bitnami/postgresql:latest
-    hostname: "postgres"
-    ports:
-      - '5432:5432'
-    env_file:
-      - ../src/kwork_parser_bot/.env
-    volumes:
-      - ./postgresql/conf/override.conf:/opt/bitnami/postgresql/conf/conf.d/override.conf
-      - postgres-data:/bitnami/postgresql
-    restart: always
-    depends_on:
-      - pgbouncer
-    healthcheck:
-      test: pg_isready -U admin
-      interval: 2s
-      timeout: 3s
-      retries: 40
-
-  pgbouncer:
-    image: bitnami/pgbouncer:latest
-    hostname: "pgbouncer"
-    env_file:
-      - ../src/kwork_parser_bot/.env
-    environment:
-      - POSTGRESQL_HOST=postgres
-    volumes:
-      - ./pgbouncer/pgbouncer.ini:/bitnami/pgbouncer/conf/pgbouncer.ini
-    ports:
-      - "6432:6432"
-    restart: always
 
 volumes:
   redis-data:
-    labels:
-      keep:
-  postgres-data:
     labels:
       keep:

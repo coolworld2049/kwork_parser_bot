@@ -6,7 +6,6 @@ from loguru import logger
 
 from kwork_parser_bot.services.kwork.schemas import KworkAccount
 from kwork_parser_bot.services.scheduler.jobs import (
-    notify_about_kwork_notifications,
     notify_about_new_projects,
 )
 from kwork_parser_bot.services.scheduler.scheduler import Scheduler
@@ -31,12 +30,6 @@ async def test_scheduler(event_loop, fake_scheduler: Scheduler):
 async def test_scheduler_jobs(
     event_loop, fake_scheduler: Scheduler, kwork_account: KworkAccount
 ):
-    notifications = await notify_about_kwork_notifications(
-        kwork_account.dict(),
-        settings().BOT_OWNER_ID,
-        settings().BOT_OWNER_ID,
-        send_message=False,
-    )
     projects = await notify_about_new_projects(
         kwork_account.dict(),
         settings().BOT_OWNER_ID,

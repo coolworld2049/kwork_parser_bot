@@ -1,7 +1,9 @@
 import json
+from contextlib import asynccontextmanager
 from datetime import timedelta
-from typing import Any
+from typing import Any, AsyncGenerator
 
+from loguru import logger
 from redis.asyncio import ConnectionPool
 from redis.asyncio.client import Redis
 
@@ -81,3 +83,17 @@ class KworkApi(Kwork):
         parent_category = self.get_parent_category(category, parent_category_id)
         category = self.get_parent_category(parent_category.subcategories, category_id)
         return category
+
+
+@asynccontextmanager
+async def get_kwork_api(
+    kwork_account: KworkAccount,
+) -> AsyncGenerator[KworkApi, None]:
+    kwork_api = KworkApi(kwork_account)
+    try:
+        yield kwork_api
+    except Exception as e:
+        logger.debug(e)
+        raise e
+    finally:
+        await kwork_api.close()

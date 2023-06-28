@@ -1,2 +1,1 @@
-from .notify_about_kwork_notifications import notify_about_kwork_notifications
 from .notify_about_new_projects import notify_about_new_projects

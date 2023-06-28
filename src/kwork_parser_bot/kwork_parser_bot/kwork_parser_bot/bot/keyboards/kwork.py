@@ -29,7 +29,7 @@ def kwork_menu_keyboard_builder():
         ),
         width=2,
     )
-    builder.add(
+    builder.row(
         InlineKeyboardButton(
             text="🔎 Category",
             callback_data=MenuCallback(name="category").pack(),

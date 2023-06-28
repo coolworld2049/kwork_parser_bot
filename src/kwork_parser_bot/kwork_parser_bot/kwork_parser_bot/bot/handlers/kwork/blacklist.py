@@ -1,4 +1,7 @@
+from contextlib import suppress
+
 from aiogram import F, Router
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message, User
 from aredis_om import NotFoundError
@@ -16,16 +19,19 @@ from kwork_parser_bot.bot.keyboards.navigation import (
 )
 from kwork_parser_bot.bot.loader import main_bot
 from kwork_parser_bot.bot.states import BlacklistState
-from kwork_parser_bot.template_engine import render_template
 from kwork_parser_bot.services.kwork.schemas import Blacklist
+from kwork_parser_bot.template_engine import render_template
 
 router = Router(name=__file__)
-blacklist_redis_key_prefix = "blacklist"
 
 
 async def blacklist_menu(user: User, state: FSMContext):
     state_data = await state.get_data()
-    redis_key = f"{blacklist_redis_key_prefix}:{user.id}"
+    with suppress(TelegramBadRequest, TypeError):
+        for m_id in range(
+            state_data.get("first_message_id"), state_data.get("current_message_id") + 1
+        ):
+            await main_bot.delete_message(user.id, m_id)
     builder = blacklist_menu_keyboard_builder()
     builder = menu_navigation_keyboard_builder(
         back_callback=MenuCallback(name="api").pack(),
@@ -38,13 +44,16 @@ async def blacklist_menu(user: User, state: FSMContext):
             telegram_user_id=user.id,
         )
         await blacklist.save()
-    await main_bot.send_message(
+    message = await main_bot.send_message(
         user.id,
         render_template(
             "blacklist.html",
             blacklist=blacklist.usernames,
         ),
         reply_markup=builder.as_markup(),
+    )
+    await state.update_data(
+        first_message_id=message.message_id, current_message_id=message.message_id
     )
 
 
@@ -60,39 +69,11 @@ async def blacklist_callback(
 
 @router.callback_query(
     BlacklistCallback.filter(F.name == "blacklist"),
-    BlacklistCallback.filter(F.action == "add"),
 )
-async def blacklist_add(
+async def blacklist_add_rm(
     query: CallbackQuery, callback_data: MenuCallback, state: FSMContext
 ):
-    builder = menu_navigation_keyboard_builder(
-        back_callback=MenuCallback(name="blacklist").pack(),
-    )
-    await query.message.delete()
-    message = await main_bot.send_message(
-        query.from_user.id,
-        "Add username",
-        reply_markup=builder.as_markup(),
-    )
-    await state.update_data(callback_data=callback_data.dict())
-    await state.set_state(BlacklistState.manage)
-
-
-@router.callback_query(
-    BlacklistCallback.filter(F.name == "blacklist" and F.action == "rm"),
-)
-async def blacklist_delete(
-    query: CallbackQuery, callback_data: MenuCallback, state: FSMContext
-):
-    builder = menu_navigation_keyboard_builder(
-        back_callback=MenuCallback(name="blacklist").pack(),
-    )
-    await query.message.delete()
-    message = await main_bot.send_message(
-        query.from_user.id,
-        "Delete username",
-        reply_markup=builder.as_markup(),
-    )
+    await query.answer("Enter username")
     await state.update_data(callback_data=callback_data.dict())
     await state.set_state(BlacklistState.manage)
 
@@ -115,5 +96,4 @@ async def blacklist_process(message: Message, state: FSMContext):
     except Exception as e:
         raise ValueError(f"Input error")
     await blacklist.update(usernames=usernames)
-    await state.clear()
     await blacklist_menu(message.from_user, state)

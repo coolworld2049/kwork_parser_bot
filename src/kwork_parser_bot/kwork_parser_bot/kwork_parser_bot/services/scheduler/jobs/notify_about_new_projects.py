@@ -9,7 +9,7 @@ from kwork_parser_bot.services.kwork.schemas import (
     KworkAccount,
     Blacklist,
 )
-from kwork_parser_bot.services.kwork.session import get_kwork_api
+from kwork_parser_bot.services.kwork.kwork import get_kwork_api
 from kwork_parser_bot.template_engine import render_template
 
 

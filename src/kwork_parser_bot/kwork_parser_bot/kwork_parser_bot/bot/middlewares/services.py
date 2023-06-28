@@ -22,7 +22,7 @@ class ServicesMiddleware(BaseMiddleware):
                 KworkAccount.telegram_user_id == user.id
             ).first()
             data["kwork_api"] = KworkApi(kwork_account)
-            logger.debug(data["kwork_api"].session.__dict__)
+            logger.debug(data["kwork_api"].__dict__)
         except Exception as e:
             logger.debug(e)
         result = await handler(event, data)

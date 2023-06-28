@@ -10,13 +10,13 @@ from kwork_parser_bot.bot.callbacks import (
     MenuCallback,
 )
 from kwork_parser_bot.bot.handlers.decorators import message_process
+from kwork_parser_bot.bot.handlers.kwork.menu import kwork_menu
 from kwork_parser_bot.bot.handlers.menu import start_message, start_callback
 from kwork_parser_bot.bot.keyboards.kwork import auth_keyboard_builder
 from kwork_parser_bot.bot.loader import main_bot
 from kwork_parser_bot.bot.states import AuthState
-from kwork_parser_bot.services.kwork.kwork import KworkApi
+from kwork_parser_bot.services.kwork.kwork import KworkApi, get_kwork_api
 from kwork_parser_bot.services.kwork.schemas import KworkAccount
-from kwork_parser_bot.services.kwork.session import get_kwork_api
 
 router = Router(name=__file__)
 
@@ -26,12 +26,18 @@ async def auth_menu(user: User, state: FSMContext):
     message = await main_bot.send_message(
         user.id,
         "Enter your kwork kwork_account login.\n<b>Attention! Data will be updated</b>",
-        reply_markup=auth_keyboard_builder().as_markup(),
+        reply_markup=auth_keyboard_builder(callback_name="api").as_markup(),
     )
     await state.update_data(
         first_message_id=message.message_id, current_message_id=message.message_id
     )
     await state.set_state(AuthState.set_login)
+
+
+@router.callback_query(MenuCallback.filter(F.name == "api-login"))
+async def auth_callback(query: CallbackQuery, state: FSMContext):
+    await query.message.delete()
+    await auth_menu(query.from_user, state)
 
 
 async def auth_cancel(user: User, state: FSMContext):
@@ -52,16 +58,12 @@ async def auth_cancel_message(message: Message, state: FSMContext):
 
 
 @router.callback_query(MenuCallback.filter(F.name == "api-login" and F.action == "rm"))
-async def auth_cancel_callback(query: CallbackQuery, state: FSMContext):
+async def auth_cancel_callback(
+    query: CallbackQuery, state: FSMContext, kwork_api: KworkApi
+):
     await query.message.delete()
     await auth_cancel(query.from_user, state)
-    await start_callback(query, state)
-
-
-@router.callback_query(MenuCallback.filter(F.name == "api-login"))
-async def auth_callback(query: CallbackQuery, state: FSMContext):
-    await query.message.delete()
-    await auth_menu(query.from_user, state)
+    await kwork_menu(query, state, kwork_api)
 
 
 @router.message(AuthState.set_login)

@@ -1,5 +1,4 @@
 from aiogram import Dispatcher
-from aiogram.types import BotCommand
 from aredis_om import Migrator
 
 from kwork_parser_bot.bot import loader
@@ -13,16 +12,11 @@ from kwork_parser_bot.services.scheduler.lifetime import (
 from kwork_parser_bot.settings import settings
 
 
-async def set_bot_commands(commands: list[BotCommand]):
-    if await main_bot.get_my_commands() == commands:
-        await main_bot.delete_my_commands()
-    else:
-        await main_bot.set_my_commands(commands)
-
-
 async def startup(dp: Dispatcher) -> None:
     await main_bot.delete_webhook(drop_pending_updates=True)
-    await set_bot_commands(settings().BOT_COMMANDS)
+    if not await main_bot.get_my_commands() == settings().BOT_COMMANDS:
+        await main_bot.delete_my_commands()
+        await main_bot.set_my_commands(settings().BOT_COMMANDS)
     init_scheduler(loader.scheduler)
     dp.include_routers(
         menu.router,
@@ -37,7 +31,7 @@ async def shutdown(dp: Dispatcher) -> None:
     shutdown_scheduler(loader.scheduler)
 
 
-async def run_main_bot():
+async def run_bot():
     try:
         await startup(dp)
         await dp.start_polling(main_bot)

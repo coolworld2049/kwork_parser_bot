@@ -33,7 +33,7 @@ async def category_menu(
 ):
     await state.clear()
     if not kwork_api:
-        await query.answer("Bad kwork credentials")
+        await query.answer("Log in to your kwork account", show_alert=True)
         return None
     category = await kwork_api.cached_category(redis_pool)
     builder = category_keyboard_builder(category, callback_name="subcategory")

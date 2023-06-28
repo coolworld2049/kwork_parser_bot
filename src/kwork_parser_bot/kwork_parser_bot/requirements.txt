@@ -6,7 +6,6 @@ loguru
 jinja2
 stringcase
 apscheduler
-cron-validator
 sqlalchemy==2.0.17
 asyncpg
 psycopg2

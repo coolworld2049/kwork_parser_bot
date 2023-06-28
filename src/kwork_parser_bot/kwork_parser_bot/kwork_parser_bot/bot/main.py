@@ -34,6 +34,6 @@ async def shutdown(dp: Dispatcher) -> None:
 async def run_bot():
     try:
         await startup(dp)
-        await dp.start_polling(main_bot)
+        await dp.start_polling(main_bot, polling_timeout=5)
     finally:
         await shutdown(dp)

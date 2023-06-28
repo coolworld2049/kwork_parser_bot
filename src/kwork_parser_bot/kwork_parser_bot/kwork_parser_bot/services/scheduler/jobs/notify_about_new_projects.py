@@ -1,15 +1,17 @@
+import asyncio
+
 from aredis_om import NotFoundError
 from loguru import logger
 from redis.exceptions import ResponseError
 
 from kwork_parser_bot.bot.loader import main_bot, scheduler, redis_pool
 from kwork_parser_bot.services.kwork.api.types import Project
+from kwork_parser_bot.services.kwork.kwork import get_kwork_api
 from kwork_parser_bot.services.kwork.schemas import (
     KworkProject,
     KworkAccount,
     Blacklist,
 )
-from kwork_parser_bot.services.kwork.kwork import get_kwork_api
 from kwork_parser_bot.template_engine import render_template
 
 
@@ -40,11 +42,7 @@ async def notify_about_new_projects(
             redis_pool, subcategories_ids, ex=ex
         )
         if cached_projects:
-            if len(cached_projects) > 100:
-                cached_projects = []
-            old_projects: list[Project] = list(
-                filter(lambda x: Project(id=x.id, username=x.username), cached_projects)
-            )
+            old_projects = cached_projects
         new_projects: list[Project] = await api.get_projects(subcategories_ids)
 
         def log_msg(*args):
@@ -65,7 +63,7 @@ async def notify_about_new_projects(
                 filter(
                     lambda x: Project(id=x.id, username=x.username)
                     if x.id in projects_diff_ids
-                    and x.username not in blacklist.usernames
+                       and x.username not in blacklist.usernames
                     else None,
                     new_projects,
                 )
@@ -94,8 +92,17 @@ async def notify_about_new_projects(
         projects=projects,
     )
     if send_message:
-        await main_bot.send_message(
-            chat_id,
-            rendered,
-            disable_web_page_preview=True,
-        )
+        if len(rendered) >= 4096:
+            for r in rendered.split("\n\n"):
+                await asyncio.sleep(1.1)
+                await main_bot.send_message(
+                    chat_id,
+                    r,
+                    disable_web_page_preview=True,
+                )
+        else:
+            await main_bot.send_message(
+                chat_id,
+                rendered,
+                disable_web_page_preview=True,
+            )

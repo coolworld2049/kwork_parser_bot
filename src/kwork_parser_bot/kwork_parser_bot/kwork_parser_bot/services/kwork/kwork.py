@@ -49,7 +49,7 @@ class KworkApi(Kwork):
         redis_pool: ConnectionPool,
         categories_ids: list[int],
         data: list[Project] = None,
-        ex: timedelta = timedelta(hours=6),
+        ex: int = 86400,
         update=False,
     ):
         key = self._r_key(f"projects:{':'.join([str(x) for x in categories_ids])}")

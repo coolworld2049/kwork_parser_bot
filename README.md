@@ -1,7 +1,5 @@
 # Kwork projects parser
 
----
-
 ![1.png](assets/1.png)
 ![2.png](assets/2.png)
 ![3.png](assets/3.png)
@@ -12,8 +10,6 @@
 ![8.png](assets/8.png)
 ![9.png](assets/9.png)
 ![10.png](assets/10.png)
-
----
 
 ## Deployment
 

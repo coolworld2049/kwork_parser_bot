@@ -6,14 +6,14 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import User, Message, CallbackQuery
 
-from bot.callbacks import MenuCallback
-from bot.keyboards.menu import (
+from telegram_bot.callbacks import MenuCallback
+from telegram_bot.keyboards.menu import (
     menu_keyboard_builder,
 )
-from bot.keyboards.navigation import (
+from telegram_bot.keyboards.navigation import (
     menu_navigation_keyboard_builder,
 )
-from bot.loader import main_bot
+from telegram_bot.loader import bot
 from template_engine import render_template
 from settings import settings
 
@@ -22,14 +22,14 @@ router = Router(name=__file__)
 
 async def start_cmd(user: User, state: FSMContext, message_id: int):
     with suppress(TelegramBadRequest):
-        await main_bot.delete_message(user.id, message_id - 1)
+        await bot.delete_message(user.id, message_id - 1)
     await state.clear()
-    await main_bot.send_message(
+    await bot.send_message(
         user.id,
         render_template(
             "start.html",
             user=user,
-            bot=await main_bot.me(),
+            bot=await bot.me(),
         ),
         reply_markup=menu_keyboard_builder().as_markup(),
     )
@@ -58,7 +58,7 @@ async def help_callback(query: CallbackQuery, state: FSMContext):
     builder = menu_navigation_keyboard_builder(
         menu_callback=MenuCallback(name="start").pack()
     )
-    await main_bot.send_message(
+    await bot.send_message(
         query.from_user.id,
         render_template(
             "help.html",

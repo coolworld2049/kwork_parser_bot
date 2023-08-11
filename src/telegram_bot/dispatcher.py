@@ -7,8 +7,8 @@ from aiogram.fsm.storage.redis import (
 )
 from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 
-from bot.loader import redis
-from bot.middlewares.services import ServicesMiddleware
+from telegram_bot.loader import redis
+from telegram_bot.middlewares.services import ServicesMiddleware
 
 dp = Dispatcher(
     events_isolation=RedisEventIsolation(redis),

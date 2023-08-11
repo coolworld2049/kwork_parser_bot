@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from bot.callbacks import SchedulerCallback
+from telegram_bot.callbacks import SchedulerCallback
 from scheduler.models import SchedulerJob
 
 

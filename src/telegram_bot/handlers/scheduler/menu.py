@@ -5,15 +5,15 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from bot.callbacks import MenuCallback
-from bot.handlers.menu import start_callback
-from bot.keyboards.navigation import (
+from telegram_bot.callbacks import MenuCallback
+from telegram_bot.handlers.menu import start_callback
+from telegram_bot.keyboards.navigation import (
     menu_navigation_keyboard_builder,
 )
-from bot.keyboards.scheduler import (
+from telegram_bot.keyboards.scheduler import (
     scheduler_menu_keyboard_builder,
 )
-from bot.loader import main_bot, scheduler
+from telegram_bot.loader import bot, scheduler
 from settings import settings
 from template_engine import render_template
 
@@ -29,7 +29,7 @@ async def scheduler_menu(query: CallbackQuery, state: FSMContext):
         inline_buttons=builder.buttons,
     )
     if jobs:
-        await main_bot.send_message(
+        await bot.send_message(
             query.from_user.id,
             render_template(
                 "scheduler.html",

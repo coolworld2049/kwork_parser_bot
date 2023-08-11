@@ -7,17 +7,17 @@ from aiogram.types import CallbackQuery
 from aredis_om import NotFoundError
 from loguru import logger
 
-from bot.callbacks import (
+from telegram_bot.callbacks import (
     MenuCallback,
 )
-from bot.keyboards.kwork import (
+from telegram_bot.keyboards.kwork import (
     kwork_menu_keyboard_builder,
 )
-from bot.keyboards.navigation import (
+from telegram_bot.keyboards.navigation import (
     menu_navigation_keyboard_builder,
 )
-from bot.loader import main_bot
-from bot.states import SchedulerState
+from telegram_bot.loader import bot
+from telegram_bot.states import SchedulerState
 from kwork_api.client.exceptions import KworkException
 from kwork_api.kwork import KworkApi
 from kwork_api.models import KworkActor, KworkAccount
@@ -48,7 +48,7 @@ async def kwork_menu(query: CallbackQuery, state: FSMContext, kwork_api: KworkAp
         builder,
         menu_callback=MenuCallback(name="start").pack(),
     )
-    await main_bot.send_message(
+    await bot.send_message(
         query.from_user.id,
         render_template("kwork_menu.html", actor=kwork_account.actor),
         reply_markup=builder.as_markup(),

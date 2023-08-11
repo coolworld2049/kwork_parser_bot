@@ -3,20 +3,20 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from loguru import logger
 
-from bot.callbacks import (
+from telegram_bot.callbacks import (
     MenuCallback,
     KworkCategoryCallback,
     SchedulerCallback,
 )
-from bot.keyboards.kwork import category_keyboard_builder
-from bot.keyboards.navigation import (
+from telegram_bot.keyboards.kwork import category_keyboard_builder
+from telegram_bot.keyboards.navigation import (
     menu_navigation_keyboard_builder,
 )
-from bot.keyboards.scheduler import (
+from telegram_bot.keyboards.scheduler import (
     scheduler_jobs_keyboard_builder,
 )
-from bot.loader import main_bot, redis_pool
-from bot.states import SchedulerState
+from telegram_bot.loader import bot, redis_pool
+from telegram_bot.states import SchedulerState
 from kwork_api.kwork import KworkApi
 from scheduler.models import SchedulerJob
 from settings import settings
@@ -42,7 +42,7 @@ async def category_menu(
         back_callback=MenuCallback(name="client").pack(),
         menu_callback=MenuCallback(name="start").pack(),
     )
-    await main_bot.send_message(
+    await bot.send_message(
         query.from_user.id,
         text="🤖 Category 🤖",
         reply_markup=builder.as_markup(),
@@ -66,7 +66,7 @@ async def subcategory(
         back_callback=MenuCallback(name="category", action="get").pack(),
         menu_callback=MenuCallback(name="start").pack(),
     )
-    await main_bot.send_message(
+    await bot.send_message(
         query.from_user.id,
         text="🤖 Subcategory 🤖",
         reply_markup=builder.as_markup(),
@@ -125,7 +125,7 @@ async def subcategory_sched_job(
         ).pack(),
         menu_callback=MenuCallback(name="start").pack(),
     )
-    await main_bot.send_message(
+    await bot.send_message(
         query.from_user.id,
         text="🤖 Scheduler jobs menu 🤖",
         reply_markup=builder.as_markup(),

@@ -18,9 +18,16 @@ class SchedulerSettings(BaseSettings):
 class BotSettings(BaseSettings):
     BOT_TOKEN: str
     BOT_COMMANDS: list[BotCommand] = [
-        BotCommand(command="/start", description="start the bot"),
+        BotCommand(command="/start", description="start the telegram_bot"),
     ]
     NOTIFICATION_CHANNEL_ID: Optional[int] = None
+    WEBHOOK_URL: Optional[str] = None
+    WEB_APP_HOST: Optional[str] = "0.0.0.0"
+    WEB_APP_PORT: Optional[int] = 8000
+
+    @property
+    def webhook_url(self):
+        return f"{self.WEBHOOK_URL}/telegram_bot{self.BOT_TOKEN}"
 
 
 class RedisSettings(BaseSettings):

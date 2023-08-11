@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from bot.callbacks import ConfirmCallback
+from telegram_bot.callbacks import ConfirmCallback
 
 
 def confirm_keyboard_builder(callback_name: str):

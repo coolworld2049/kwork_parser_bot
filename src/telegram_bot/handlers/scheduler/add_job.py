@@ -5,17 +5,17 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from apscheduler.triggers.cron import CronTrigger
 
-from bot.callbacks import (
+from telegram_bot.callbacks import (
     SchedulerCallback,
     MenuCallback,
 )
-from bot.handlers.decorators import message_process
-from bot.handlers.menu import start_message
-from bot.keyboards.navigation import (
+from telegram_bot.handlers.decorators import message_process
+from telegram_bot.handlers.menu import start_message
+from telegram_bot.keyboards.navigation import (
     menu_navigation_keyboard_builder,
 )
-from bot.loader import main_bot, scheduler
-from bot.states import SchedulerState
+from telegram_bot.loader import bot, scheduler
+from telegram_bot.states import SchedulerState
 from scheduler.models import SchedulerJob
 from settings import settings
 from template_engine import render_template
@@ -35,7 +35,7 @@ async def scheduler_add_job_trigger_process(
         back_callback=MenuCallback(name=callback_data.from_).pack(),
         menu_callback=MenuCallback(name="start").pack(),
     )
-    message = await main_bot.send_message(
+    message = await bot.send_message(
         query.from_user.id,
         render_template(
             "cron.html",

@@ -4,7 +4,7 @@ from aredis_om import NotFoundError
 from loguru import logger
 from redis.exceptions import ResponseError
 
-from bot.loader import main_bot, scheduler, redis_pool
+from telegram_bot.loader import bot, scheduler, redis_pool
 from kwork_api.client.types import Project
 from kwork_api.kwork import get_kwork_api
 from kwork_api.models import (
@@ -95,13 +95,13 @@ async def notify_about_new_projects(
         if len(rendered) >= 4096:
             for r in rendered.split("\n\n"):
                 await asyncio.sleep(1.1)
-                await main_bot.send_message(
+                await bot.send_message(
                     chat_id,
                     r,
                     disable_web_page_preview=True,
                 )
         else:
-            await main_bot.send_message(
+            await bot.send_message(
                 chat_id,
                 rendered,
                 disable_web_page_preview=True,

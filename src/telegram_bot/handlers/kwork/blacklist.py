@@ -6,19 +6,19 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message, User
 from aredis_om import NotFoundError
 
-from bot.callbacks import (
+from telegram_bot.callbacks import (
     MenuCallback,
     BlacklistCallback,
 )
-from bot.handlers.decorators import message_process
-from bot.keyboards.kwork import (
+from telegram_bot.handlers.decorators import message_process
+from telegram_bot.keyboards.kwork import (
     blacklist_menu_keyboard_builder,
 )
-from bot.keyboards.navigation import (
+from telegram_bot.keyboards.navigation import (
     menu_navigation_keyboard_builder,
 )
-from bot.loader import main_bot
-from bot.states import BlacklistState
+from telegram_bot.loader import bot
+from telegram_bot.states import BlacklistState
 from kwork_api.models import Blacklist
 from template_engine import render_template
 
@@ -31,7 +31,7 @@ async def blacklist_menu(user: User, state: FSMContext):
         for m_id in range(
             state_data.get("first_message_id"), state_data.get("current_message_id") + 1
         ):
-            await main_bot.delete_message(user.id, m_id)
+            await bot.delete_message(user.id, m_id)
     builder = blacklist_menu_keyboard_builder()
     builder = menu_navigation_keyboard_builder(
         back_callback=MenuCallback(name="client").pack(),
@@ -44,7 +44,7 @@ async def blacklist_menu(user: User, state: FSMContext):
             telegram_user_id=user.id,
         )
         await blacklist.save()
-    message = await main_bot.send_message(
+    message = await bot.send_message(
         user.id,
         render_template(
             "blacklist.html",

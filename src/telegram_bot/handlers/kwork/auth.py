@@ -6,15 +6,15 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message, User, ReplyKeyboardRemove
 
-from bot.callbacks import (
+from telegram_bot.callbacks import (
     MenuCallback,
 )
-from bot.handlers.decorators import message_process
-from bot.handlers.kwork.menu import kwork_menu
-from bot.handlers.menu import start_message, start_callback
-from bot.keyboards.kwork import auth_keyboard_builder
-from bot.loader import main_bot
-from bot.states import AuthState
+from telegram_bot.handlers.decorators import message_process
+from telegram_bot.handlers.kwork.menu import kwork_menu
+from telegram_bot.handlers.menu import start_message, start_callback
+from telegram_bot.keyboards.kwork import auth_keyboard_builder
+from telegram_bot.loader import bot
+from telegram_bot.states import AuthState
 from kwork_api.kwork import KworkApi, get_kwork_api
 from kwork_api.models import KworkAccount
 
@@ -23,7 +23,7 @@ router = Router(name=__file__)
 
 async def auth_menu(user: User, state: FSMContext):
     await state.clear()
-    message = await main_bot.send_message(
+    message = await bot.send_message(
         user.id,
         "Enter your kwork account login.\n<b>Attention! Data will be updated</b>",
         reply_markup=auth_keyboard_builder(callback_name="client").as_markup(),
@@ -46,7 +46,7 @@ async def auth_cancel(user: User, state: FSMContext):
         for m_id in range(
             state_data.get("first_message_id"), state_data.get("current_message_id") + 1
         ):
-            await main_bot.delete_message(user.id, m_id)
+            await bot.delete_message(user.id, m_id)
     await state.clear()
 
 
@@ -128,7 +128,7 @@ async def auth_phone(message: Message, state: FSMContext):
     await kwork_account.expire(86400 * 7)
     with suppress(TelegramBadRequest):
         for m_id in range(state_data.get("first_message_id"), message.message_id + 1):
-            await main_bot.delete_message(message.from_user.id, m_id)
+            await bot.delete_message(message.from_user.id, m_id)
     message_answer = await message.answer("Saved", reply_markup=ReplyKeyboardRemove())
     await message_answer.delete()
     await start_message(message, state)

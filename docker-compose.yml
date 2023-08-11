@@ -3,7 +3,7 @@ version: '3'
 services:
   telegram-bot:
     build: .
-    hostname: telegram-bot
+    hostname: telegram-telegram_bot
     env_file:
       - .env
     environment:

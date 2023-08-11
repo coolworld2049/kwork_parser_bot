@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from bot.callbacks import MenuCallback
+from telegram_bot.callbacks import MenuCallback
 
 
 def menu_keyboard_builder():

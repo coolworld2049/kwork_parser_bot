@@ -2,11 +2,11 @@ from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from bot.callbacks import SchedulerCallback, ConfirmCallback
-from bot.handlers.scheduler.menu import scheduler_menu
-from bot.keyboards.confirm import confirm_keyboard_builder
-from bot.loader import main_bot, scheduler
-from bot.states import SchedulerState
+from telegram_bot.callbacks import SchedulerCallback, ConfirmCallback
+from telegram_bot.handlers.scheduler.menu import scheduler_menu
+from telegram_bot.keyboards.confirm import confirm_keyboard_builder
+from telegram_bot.loader import bot, scheduler
+from telegram_bot.states import SchedulerState
 
 router = Router(name=__file__)
 
@@ -28,9 +28,7 @@ async def scheduler_remove_job_confirm(message: Message, state: FSMContext):
     state_data = await state.get_data()
     job_id: str | list[str] = message.text.strip(" ").split(",")
     await state.update_data(job_id=job_id)
-    await main_bot.delete_message(
-        message.from_user.id, state_data.get("prev_message_id")
-    )
+    await bot.delete_message(message.from_user.id, state_data.get("prev_message_id"))
     builder = confirm_keyboard_builder(callback_name="rmjob")
     await message.reply(
         "Confirm removing",

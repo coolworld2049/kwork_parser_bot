@@ -4,7 +4,7 @@ from typing import Any
 from apscheduler.triggers.base import BaseTrigger
 from pydantic import BaseModel
 
-from bot.callbacks import SchedulerCallback
+from telegram_bot.callbacks import SchedulerCallback
 
 
 class SchedulerJobBase(BaseModel):

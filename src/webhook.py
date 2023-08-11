@@ -5,8 +5,8 @@ from loguru import logger
 
 from settings import settings
 from telegram_bot.dispatcher import dp
-from telegram_bot.loader import bot
 from telegram_bot.lifecycle import startup_bot, shutdown_bot
+from telegram_bot.loader import bot
 
 app = FastAPI()
 router = APIRouter()
@@ -40,5 +40,9 @@ async def shutdown():
     await shutdown_bot(dp)
 
 
-if __name__ == "__main__":
+def main():
     uvicorn.run(app, host=settings().WEB_APP_HOST, port=settings().WEB_APP_PORT)
+
+
+if __name__ == "__main__":
+    main()

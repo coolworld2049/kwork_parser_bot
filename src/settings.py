@@ -2,7 +2,7 @@ import logging
 import os
 import pathlib
 from functools import lru_cache
-from typing import Optional
+from typing import Optional, Literal
 
 from aiogram.types import BotCommand
 from dotenv import load_dotenv
@@ -17,6 +17,7 @@ class SchedulerSettings(BaseSettings):
 
 class BotSettings(BaseSettings):
     BOT_TOKEN: str
+    BOT_RUN_MODE: Literal["webhook", "polling"] = "polling"
     BOT_COMMANDS: list[BotCommand] = [
         BotCommand(command="/start", description="start the telegram_bot"),
     ]

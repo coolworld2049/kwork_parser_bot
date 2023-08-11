@@ -6,6 +6,8 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message, User, ReplyKeyboardRemove
 
+from kwork_api.kwork import KworkApi, get_kwork_api
+from kwork_api.models import KworkAccount
 from telegram_bot.callbacks import (
     MenuCallback,
 )
@@ -15,8 +17,6 @@ from telegram_bot.handlers.menu import start_message, start_callback
 from telegram_bot.keyboards.kwork import auth_keyboard_builder
 from telegram_bot.loader import bot
 from telegram_bot.states import AuthState
-from kwork_api.kwork import KworkApi, get_kwork_api
-from kwork_api.models import KworkAccount
 
 router = Router(name=__file__)
 
@@ -70,7 +70,7 @@ async def auth_cancel_callback(
 
 @router.message(AuthState.set_login)
 @message_process
-async def auth_login(message: Message, state: FSMContext):
+async def auth_password(message: Message, state: FSMContext):
     await state.update_data(login=message.text, current_message_id=message.message_id)
     builder = auth_keyboard_builder()
     await message.answer(
@@ -81,7 +81,7 @@ async def auth_login(message: Message, state: FSMContext):
 
 @router.message(AuthState.set_password)
 @message_process
-async def auth_password(message: Message, state: FSMContext):
+async def auth_phone(message: Message, state: FSMContext):
     await state.update_data(
         password=message.text, current_message_id=message.message_id
     )
@@ -102,7 +102,7 @@ async def auth_password(message: Message, state: FSMContext):
 @router.message(F.contact, AuthState.set_phone)
 @router.message(F.text == "❌", AuthState.set_phone)
 @message_process
-async def auth_phone(message: Message, state: FSMContext):
+async def auth_finish(message: Message, state: FSMContext):
     await state.update_data(current_message_id=message.message_id)
     state_data = await state.get_data()
     phone = None

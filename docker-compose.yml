@@ -3,14 +3,30 @@ version: '3'
 services:
   telegram-bot:
     build: .
-    hostname: telegram-telegram_bot
+    hostname: telegram-bot
+    ports:
+      - "8000:8000"
     env_file:
       - .env
     environment:
       - REDIS_MASTER_HOST=redis-server
+      - BOT_RUN_MODE=webhook
+      - WEBHOOK_URL
     depends_on:
       - redis-server
     restart: always
+  ngrok:
+    image: shkoliar/ngrok:latest
+    hostname: ngrok
+    ports:
+      - "4040:4040"
+    environment:
+      - REGION=eu
+      - DOMAIN=telegram-bot
+      - PORT=8000
+    env_file:
+      - .env
+    restart: no
   redis-server:
     image: redis/redis-stack-server:latest
     hostname: redis-server

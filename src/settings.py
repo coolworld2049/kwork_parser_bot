@@ -5,23 +5,17 @@ from functools import lru_cache
 from typing import Optional
 
 from aiogram.types import BotCommand
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 from pydantic import BaseSettings
 
-project_path = pathlib.Path(__file__).parent.parent
+load_dotenv()
 
 
-class BaseAppSettings(BaseSettings):
-    load_dotenv(find_dotenv(f"{project_path}/.env"))
-    stage_dotenv = find_dotenv(f'{project_path}/.env.{os.getenv("STAGE", "dev")}')
-    load_dotenv(stage_dotenv, override=True) if stage_dotenv else None
-
-
-class SchedulerSettings(BaseAppSettings):
+class SchedulerSettings(BaseSettings):
     SCHED_JOBS_MODULE = f"{__package__}.services.scheduler.jobs"
 
 
-class BotSettings(BaseAppSettings):
+class BotSettings(BaseSettings):
     BOT_TOKEN: str
     BOT_COMMANDS: list[BotCommand] = [
         BotCommand(command="/start", description="start the bot"),
@@ -29,7 +23,7 @@ class BotSettings(BaseAppSettings):
     NOTIFICATION_CHANNEL_ID: Optional[int] = None
 
 
-class RedisSettings(BaseAppSettings):
+class RedisSettings(BaseSettings):
     REDIS_MASTER_HOST: str
     REDIS_MASTER_PORT_NUMBER: Optional[int] = 6379
     REDIS_USERNAME: Optional[str] = "default"
@@ -48,8 +42,7 @@ class RedisSettings(BaseAppSettings):
 
 
 class Settings(BotSettings, SchedulerSettings, RedisSettings):
-    STAGE: str
-    LOG_FILE_PATH: Optional[str] = f"{project_path}/.logs"
+    LOG_FILE_PATH: Optional[str] = f"{pathlib.Path(__file__).parent.parent}/.logs"
     LOGGING_LEVEL: Optional[str] = logging.getLevelName(
         os.getenv("LOGGING_LEVEL", "INFO")
     )

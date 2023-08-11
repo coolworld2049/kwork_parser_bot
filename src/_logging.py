@@ -68,19 +68,18 @@ def configure_logging() -> None:  # pragma: no cover
     intercept_handler = InterceptHandler()
     logging.basicConfig(handlers=[intercept_handler], level=logging.NOTSET)
     logger.remove()
-    if settings().LOGGING_LEVEL == "INFO":
-        logger.add(
-            settings().LOG_FILE_PATH + "/access.log",
-            serialize=False,
-            level=settings().LOGGING_LEVEL,
-            enqueue=True,
-            backtrace=True,
-            diagnose=True,
-            encoding="UTF-8",
-            rotation="64 MB",
-            retention="14 days",
-            compression="zip",
-        )
+    logger.add(
+        settings().LOG_FILE_PATH + "/access.log",
+        serialize=False,
+        level=settings().LOGGING_LEVEL,
+        enqueue=True,
+        backtrace=True,
+        diagnose=True,
+        encoding="UTF-8",
+        rotation="64 MB",
+        retention="14 days",
+        compression="zip",
+    )
     logger.add(
         sys.stdout,
         level=settings().LOGGING_LEVEL,

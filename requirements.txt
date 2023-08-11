@@ -1,0 +1,14 @@
+aiogram==3.0.0b7
+python-dotenv
+pydantic
+loguru
+jinja2
+stringcase
+apscheduler
+sqlalchemy
+asyncpg
+psycopg2
+black
+aiohttp
+redis
+redis-om

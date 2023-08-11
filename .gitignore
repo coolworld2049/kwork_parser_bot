@@ -114,11 +114,11 @@ ENV/
 env.bak/
 venv.bak/
 
-# Spyder kwork_parser_bot settings
+# Spyder src settings
 .spyderproject
 .spyproject
 
-# Rope kwork_parser_bot settings
+# Rope src settings
 .ropeproject
 
 # mkdocs documentation

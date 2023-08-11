@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  bot:
+    build: .
+    env_file:
+      - .env
+    environment:
+      - STAGE=prod
+    depends_on:
+      - redis
+    restart: always
+  redis:
+    image: redis/redis-stack-server:latest
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    restart: always

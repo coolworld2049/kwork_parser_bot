@@ -7,13 +7,13 @@ services:
     env_file:
       - .env
     environment:
-      - REDIS_MASTER_HOST=redis
+      - REDIS_MASTER_HOST=redis-server
     depends_on:
-      - redis
+      - redis-server
     restart: always
-  redis:
+  redis-server:
     image: redis/redis-stack-server:latest
-    hostname: redis
+    hostname: redis-server
     ports:
       - "6379:6379"
       - "8001:8001"

@@ -12,7 +12,7 @@ load_dotenv()
 
 
 class SchedulerSettings(BaseSettings):
-    SCHED_JOBS_MODULE = f"{__package__}.scheduler.jobs"
+    SCHED_JOBS_MODULE = f"scheduler.jobs"
 
 
 class BotSettings(BaseSettings):

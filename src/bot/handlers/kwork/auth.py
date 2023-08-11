@@ -25,7 +25,7 @@ async def auth_menu(user: User, state: FSMContext):
     await state.clear()
     message = await main_bot.send_message(
         user.id,
-        "Enter your kwork_api kwork_account login.\n<b>Attention! Data will be updated</b>",
+        "Enter your kwork account login.\n<b>Attention! Data will be updated</b>",
         reply_markup=auth_keyboard_builder(callback_name="client").as_markup(),
     )
     await state.update_data(

@@ -42,7 +42,7 @@ async def kwork_menu(query: CallbackQuery, state: FSMContext, kwork_api: KworkAp
     except* (Exception, NotFoundError) as e:
         kwork_account = KworkAccount(telegram_user_id=query.from_user.id)
     if not kwork_api:
-        await query.answer("Log in to your kwork_api account", show_alert=True)
+        await query.answer("Log in to your kwork account", show_alert=True)
     builder = kwork_menu_keyboard_builder()
     builder = menu_navigation_keyboard_builder(
         builder,

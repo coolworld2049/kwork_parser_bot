@@ -12,11 +12,11 @@ services:
       - BOT_RUN_MODE=webhook
       - REDIS_MASTER_HOST=redis-server
     depends_on:
-      - redis
+      - redis-server
     restart: always
-  redis:
+  redis-server:
     image: redis/redis-stack-server:latest
-    hostname: redis
+    hostname: redis-server
     ports:
       - "6379:6379"
     restart: always
@@ -33,3 +33,15 @@ services:
       - DOMAIN=telegram-bot
       - PORT=8000
     restart: no
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_INSTALL_PLUGINS=redis-datasource
+    restart: unless-stopped
+    volumes:
+      - ./volumes/grafana-data:/var/lib/grafana
+
+volumes:
+  grafana-data:

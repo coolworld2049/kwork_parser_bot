@@ -4,7 +4,6 @@ from aredis_om import NotFoundError
 from loguru import logger
 from redis.exceptions import ResponseError
 
-from telegram_bot.loader import bot, scheduler, redis_pool
 from kwork_api.api.types import Project
 from kwork_api.kwork import get_kwork_api
 from kwork_api.models import (
@@ -12,6 +11,7 @@ from kwork_api.models import (
     KworkAccount,
     Blacklist,
 )
+from telegram_bot.loader import bot, scheduler, redis_pool
 from template_engine import render_template
 
 
@@ -79,6 +79,7 @@ async def notify_about_new_projects(
         category = await api.cached_category(redis_pool)
         for p in new_projects:
             p = KworkProject(**p.dict())
+            p.description = p.description.replace("<br>", "\n").replace("</br>", "\n")
             p.category_id = api.get_category(
                 category, p.parent_category_id, p.category_id
             ).name
@@ -95,14 +96,20 @@ async def notify_about_new_projects(
         if len(rendered) >= 4096:
             for r in rendered.split("\n\n"):
                 await asyncio.sleep(1.1)
+                try:
+                    await bot.send_message(
+                        chat_id,
+                        r,
+                        disable_web_page_preview=True,
+                    )
+                except Exception as e:
+                    logger.error(e)
+        else:
+            try:
                 await bot.send_message(
                     chat_id,
-                    r,
+                    rendered,
                     disable_web_page_preview=True,
                 )
-        else:
-            await bot.send_message(
-                chat_id,
-                rendered,
-                disable_web_page_preview=True,
-            )
+            except Exception as e:
+                logger.error(e)

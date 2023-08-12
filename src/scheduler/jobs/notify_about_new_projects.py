@@ -94,12 +94,13 @@ async def notify_about_new_projects(
     )
     if send_message:
         if len(rendered) >= 4096:
-            for r in rendered.split("\n\n"):
-                await asyncio.sleep(1.1)
+            for i, r in enumerate(rendered.split("\n\n")):
+                await asyncio.sleep(.1)
                 try:
                     await bot.send_message(
                         chat_id,
                         r,
+                        disable_notification=False if i == 0 else True,
                         disable_web_page_preview=True,
                     )
                 except Exception as e:

@@ -18,6 +18,8 @@ class SchedulerSettings(BaseSettings):
 class BotSettings(BaseSettings):
     BOT_TOKEN: str
     BOT_RUN_MODE: Literal["webhook", "polling"] = "polling"
+    BOT_ACL_USER_IDS: Optional[list[int]] = None
+    BOT_ACL_ENABLED: Literal["True", "true", "False", "false"] = "false"
     BOT_COMMANDS: list[BotCommand] = [
         BotCommand(command="/start", description="start the telegram_bot"),
     ]
@@ -29,6 +31,13 @@ class BotSettings(BaseSettings):
     @property
     def webhook_url(self):
         return f"{self.WEBHOOK_URL}/telegram_bot{self.BOT_TOKEN}"
+
+    @property
+    def is_bot_acl_enabled(self):
+        if self.BOT_ACL_ENABLED in ["True", "true"]:
+            return True
+        elif self.BOT_ACL_ENABLED in ["False", "false"]:
+            return False
 
 
 class RedisSettings(BaseSettings):

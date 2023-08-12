@@ -13,7 +13,6 @@ services:
       - BOT_RUN_MODE=webhook
       - REDIS_MASTER_HOST=redis-server
     depends_on:
-      - grafana
       - redis-server
     restart: always
   redis-server:

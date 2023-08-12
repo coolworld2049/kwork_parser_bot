@@ -9,9 +9,11 @@ services:
     env_file:
       - .env
     environment:
+      - WEBHOOK_URL
       - BOT_RUN_MODE=webhook
       - REDIS_MASTER_HOST=redis-server
     depends_on:
+      - grafana
       - redis-server
     restart: always
   redis-server:
@@ -32,7 +34,7 @@ services:
       - REGION=eu
       - DOMAIN=telegram-bot
       - PORT=8000
-    restart: no
+    restart: "no"
   grafana:
     image: grafana/grafana:latest
     ports:

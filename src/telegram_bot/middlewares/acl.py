@@ -18,6 +18,8 @@ class ACLMiddleware(BaseMiddleware):
         if not settings().BOT_ACL_USER_IDS or not len(settings().BOT_ACL_USER_IDS) > 0:
             logger.error(f"BOT_ACL_USER_IDS={settings().BOT_ACL_USER_IDS}")
             return None
-        if user.id not in settings().BOT_ACL_USER_IDS:
+        elif user.id not in settings().BOT_ACL_USER_IDS:
             logger.info(f"Access denied for user - {user.json()}")
             return None
+        else:
+            return await handler(event, data)

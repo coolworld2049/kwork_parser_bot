@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="Black">
-    <option name="enabledOnReformat" value="true" />
-    <option name="pathToExecutable" value="C:\Users\coolw\AppData\Local\Programs\Python\Python311\Scripts\black.exe" />
-    <option name="sdkUUID" value="6f952656-a961-4e0c-a606-960ba9acd272" />
-  </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.11 (kwork_parser_bot)" project-jdk-type="Python SDK" />
-</project>

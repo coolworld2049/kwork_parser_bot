@@ -8,8 +8,8 @@ from telegram_bot.callbacks import (
     MenuCallback,
     BlacklistCallback,
 )
-from kwork_api.client.types import Category
-from kwork_api.client.types.category import Subcategory
+from kwork_api.api.types import Category
+from kwork_api.api.types.category import Subcategory
 
 
 def kwork_menu_keyboard_builder():

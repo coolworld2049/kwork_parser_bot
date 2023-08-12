@@ -5,7 +5,7 @@ from loguru import logger
 from redis.exceptions import ResponseError
 
 from telegram_bot.loader import bot, scheduler, redis_pool
-from kwork_api.client.types import Project
+from kwork_api.api.types import Project
 from kwork_api.kwork import get_kwork_api
 from kwork_api.models import (
     KworkProject,

@@ -15,4 +15,4 @@ def init_scheduler(scheduler: Scheduler) -> None:
 
 
 def shutdown_scheduler(scheduler) -> None:
-    scheduler.shutdown_bot()
+    scheduler.shutdown(wait=False)

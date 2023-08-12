@@ -5,7 +5,7 @@ import pytz
 from aredis_om import Field, JsonModel
 
 from telegram_bot.loader import redis
-from kwork_api.client.types import Project, Actor
+from kwork_api.api.types import Project, Actor
 from settings import settings
 
 

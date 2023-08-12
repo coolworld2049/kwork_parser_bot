@@ -18,7 +18,7 @@ from telegram_bot.keyboards.navigation import (
 )
 from telegram_bot.loader import bot
 from telegram_bot.states import SchedulerState
-from kwork_api.client.exceptions import KworkException
+from kwork_api.api.exceptions import KworkException
 from kwork_api.kwork import KworkApi
 from kwork_api.models import KworkActor, KworkAccount
 from template_engine import render_template

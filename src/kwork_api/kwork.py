@@ -7,9 +7,9 @@ from loguru import logger
 from redis.asyncio import ConnectionPool
 from redis.asyncio.client import Redis
 
-from kwork_api.client.kwork import Kwork
-from kwork_api.client.types import Category, Project
-from kwork_api.client.types.category import Subcategory
+from kwork_api.api.kwork import Kwork
+from kwork_api.api.types import Category, Project
+from kwork_api.api.types.category import Subcategory
 from kwork_api.models import KworkAccount
 
 

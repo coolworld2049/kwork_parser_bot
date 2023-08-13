@@ -9,7 +9,7 @@ from telegram_bot.callbacks import (
     SchedulerCallback,
     MenuCallback,
 )
-from telegram_bot.handlers.decorators import message_process
+from telegram_bot.handlers.decorators import message_process_error
 from telegram_bot.handlers.menu import start_message
 from telegram_bot.keyboards.navigation import (
     menu_navigation_keyboard_builder,
@@ -47,7 +47,7 @@ async def scheduler_add_job_trigger_process(
 
 
 @router.message(SchedulerState.add_job)
-@message_process
+@message_process_error
 async def scheduler_add_job_process(message: Message, state: FSMContext):
     cron_trigger = CronTrigger(jitter=random.randint(120, 180)).from_crontab(
         message.text, timezone=settings().TIMEZONE

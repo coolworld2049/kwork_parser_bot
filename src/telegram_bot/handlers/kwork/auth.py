@@ -11,7 +11,7 @@ from kwork_api.models import KworkAccount
 from telegram_bot.callbacks import (
     MenuCallback,
 )
-from telegram_bot.handlers.decorators import message_process
+from telegram_bot.handlers.decorators import message_process_error
 from telegram_bot.handlers.kwork.menu import kwork_menu
 from telegram_bot.handlers.menu import start_message, start_callback
 from telegram_bot.keyboards.kwork import auth_keyboard_builder
@@ -69,7 +69,7 @@ async def auth_cancel_callback(
 
 
 @router.message(AuthState.set_login)
-@message_process
+@message_process_error
 async def auth_password(message: Message, state: FSMContext):
     await state.update_data(login=message.text, current_message_id=message.message_id)
     builder = auth_keyboard_builder()
@@ -80,7 +80,7 @@ async def auth_password(message: Message, state: FSMContext):
 
 
 @router.message(AuthState.set_password)
-@message_process
+@message_process_error
 async def auth_phone(message: Message, state: FSMContext):
     await state.update_data(
         password=message.text, current_message_id=message.message_id
@@ -101,7 +101,7 @@ async def auth_phone(message: Message, state: FSMContext):
 @router.message(AuthState.set_phone)
 @router.message(F.contact, AuthState.set_phone)
 @router.message(F.text == "❌", AuthState.set_phone)
-@message_process
+@message_process_error
 async def auth_finish(message: Message, state: FSMContext):
     await state.update_data(current_message_id=message.message_id)
     state_data = await state.get_data()
@@ -136,6 +136,7 @@ async def auth_finish(message: Message, state: FSMContext):
 
 @router.callback_query(MenuCallback.filter(F.name == "client-logout"))
 async def logout(query: CallbackQuery, state: FSMContext, kwork_api: KworkApi):
-    kwork_account = kwork_api.kwork_account
-    await kwork_account.expire(0)
+    if kwork_api:
+        kwork_account = kwork_api.kwork_account
+        await kwork_account.expire(0)
     await start_callback(query, state)

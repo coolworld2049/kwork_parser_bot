@@ -13,13 +13,41 @@ services:
       - BOT_RUN_MODE=webhook
       - REDIS_MASTER_HOST=redis-server
     depends_on:
-      - redis-server
+      - pgbouncer
+      - redis
     restart: always
-  redis-server:
+  pgbouncer:
+    image: bitnami/pgbouncer:latest
+    hostname: pgbouncer
+    ports:
+      - "6432:6432"
+    env_file:
+      - .env
+    environment:
+      - POSTGRESQL_HOST=postgres
+    volumes:
+      - ./deployment/pgbouncer/pgbouncer.ini:/bitnami/pgbouncer/conf/pgbouncer.ini
+    restart: always
+    depends_on:
+      - postgres
+  postgres:
+    image: bitnami/postgresql:latest
+    hostname: postgresql
+    ports:
+      - '5432:5432'
+    env_file:
+      - .env
+    volumes:
+      - ./deployment/postgresql/conf/override.conf:/opt/bitnami/postgresql/conf/conf.d/override.conf
+      - postgres-data:/bitnami/postgresql
+    restart: always
+  redis:
     image: redis/redis-stack-server:latest
-    hostname: redis-server
+    hostname: redis
     ports:
       - "6379:6379"
+    volumes:
+      - ./deployment/redis/redis-stack.conf:/opt/redis-stack/etc/redis-stack.conf
     restart: always
   ngrok:
     image: shkoliar/ngrok:latest
@@ -34,3 +62,6 @@ services:
       - DOMAIN=telegram-bot
       - PORT=8000
     restart: "no"
+
+volumes:
+  postgres-data:

@@ -10,7 +10,7 @@ from telegram_bot.callbacks import (
     MenuCallback,
     BlacklistCallback,
 )
-from telegram_bot.handlers.decorators import message_process
+from telegram_bot.handlers.decorators import message_process_error
 from telegram_bot.keyboards.kwork import (
     blacklist_menu_keyboard_builder,
 )
@@ -79,7 +79,7 @@ async def blacklist_add_rm(
 
 
 @router.message(BlacklistState.manage)
-@message_process
+@message_process_error
 async def blacklist_process(message: Message, state: FSMContext):
     state_data = await state.get_data()
     callback_data: MenuCallback = MenuCallback(**state_data.get("callback_data"))

@@ -8,7 +8,7 @@ from aiogram.types import Message
 from loguru import logger
 
 
-def message_process(func):
+def message_process_error(func):
     async def process_error(e, *args, **kwargs):
         message: Message = args[0]
         state: FSMContext = kwargs.get("state")

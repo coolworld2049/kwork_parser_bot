@@ -7,8 +7,8 @@ from aiogram.fsm.storage.redis import (
 )
 from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 
-from settings import get_settings
 from loader import redis
+from settings import get_settings
 from telegram_bot.middlewares.acl import ACLMiddleware
 
 dp = Dispatcher(

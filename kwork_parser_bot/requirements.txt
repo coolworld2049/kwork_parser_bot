@@ -1,6 +1,6 @@
 aiogram==3.0.0b7
 python-dotenv~=1.0.0
-pydantic~=1.10.12
+pydantic==1.10.12
 loguru~=0.7.0
 jinja2~=3.1.2
 stringcase~=1.2.0
@@ -14,5 +14,5 @@ redis~=4.6.0
 fastapi~=0.101.0
 pytz~=2023.3
 uvicorn~=0.23.2
-prisma
+prisma==0.9.1
 passlib

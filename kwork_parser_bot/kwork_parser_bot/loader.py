@@ -1,9 +1,7 @@
-import os
-
 from aiogram import Bot
+from prisma import Prisma
 from redis.asyncio import Redis, ConnectionPool
 
-from prisma import Prisma
 from scheduler.scheduler import Scheduler
 from settings import get_settings
 

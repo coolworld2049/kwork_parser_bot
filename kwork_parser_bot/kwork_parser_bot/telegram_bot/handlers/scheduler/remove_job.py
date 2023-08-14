@@ -1,11 +1,14 @@
+from contextlib import suppress
+
 from aiogram import F, Router
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from telegram_bot.callbacks import SchedulerCallback, ConfirmCallback
+from loader import scheduler, bot
+from telegram_bot.callbacks import SchedulerCallback
+from telegram_bot.handlers.menu import start_cmd
 from telegram_bot.handlers.scheduler.menu import scheduler_menu
-from telegram_bot.keyboards.confirm import confirm_keyboard_builder
-from loader import bot, scheduler
 from telegram_bot.states import SchedulerState
 
 router = Router(name=__file__)
@@ -24,32 +27,14 @@ async def scheduler_remove_job_process(
 
 
 @router.message(SchedulerState.remove_job)
-async def scheduler_remove_job_confirm(message: Message, state: FSMContext):
+async def scheduler_remove_job(message: Message, state: FSMContext):
     state_data = await state.get_data()
     job_id: str | list[str] = message.text.strip(" ").split(",")
-    await state.update_data(job_id=job_id)
-    await bot.delete_message(message.from_user.id, state_data.get("prev_message_id"))
-    builder = confirm_keyboard_builder(callback_name="rmjob")
-    await message.reply(
-        "Confirm removing",
-        reply_markup=builder.as_markup(),
-    )
-
-
-@router.callback_query(
-    ConfirmCallback.filter(F.name == "rmjob"), SchedulerState.remove_job
-)
-async def scheduler_remove_job(
-    query: CallbackQuery,
-    callback_data: ConfirmCallback,
-    state: FSMContext,
-):
-    state_data = await state.get_data()
-    job_id: str | list[str] = state_data.get("job_id")
-    if callback_data.answer == "yes":
-        results = scheduler.remove_user_job(query.from_user.id, job_id)
-        await query.answer("\n".join(results), show_alert=True)
-    elif callback_data.answer == "no":
-        await query.answer("Deletion canceled")
-    await state.clear()
-    await scheduler_menu(query, state)
+    prev_message_id = state_data.get("prev_message_id")
+    results = scheduler.remove_user_job(message.from_user.id, job_id)
+    with suppress(TelegramBadRequest):
+        await bot.delete_message(message.from_user.id, message.message_id)
+        await bot.delete_message(message.from_user.id, message.message_id - 1)
+    exist = await scheduler_menu(message.from_user, state)
+    if not exist:
+        await start_cmd(message.from_user, state, message.message_id)

@@ -4,8 +4,11 @@ from aiogram import F, Router
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message, User
-from aredis_om import NotFoundError
+from prisma.errors import RecordNotFoundError
+from prisma.models import Blacklist
+from prisma.types import BlacklistCreateInput
 
+from loader import bot
 from telegram_bot.callbacks import (
     MenuCallback,
     BlacklistCallback,
@@ -17,9 +20,7 @@ from telegram_bot.keyboards.kwork import (
 from telegram_bot.keyboards.navigation import (
     menu_navigation_keyboard_builder,
 )
-from telegram_bot.loader import bot
 from telegram_bot.states import BlacklistState
-from kwork_api.models import Blacklist
 from template_engine import render_template
 
 router = Router(name=__file__)
@@ -37,13 +38,9 @@ async def blacklist_menu(user: User, state: FSMContext):
         back_callback=MenuCallback(name="client").pack(),
         inline_buttons=builder.buttons,
     )
-    try:
-        blacklist = await Blacklist.find(Blacklist.telegram_user_id == user.id).first()
-    except NotFoundError:
-        blacklist = Blacklist(
-            telegram_user_id=user.id,
-        )
-        await blacklist.save()
+    blacklist = (
+        await Blacklist.prisma().find_unique(where={"telegram_user_id": user.id}) or []
+    )
     message = await bot.send_message(
         user.id,
         render_template(
@@ -83,17 +80,23 @@ async def blacklist_add_rm(
 async def blacklist_process(message: Message, state: FSMContext):
     state_data = await state.get_data()
     callback_data: MenuCallback = MenuCallback(**state_data.get("callback_data"))
-    blacklist: Blacklist = await Blacklist.find(
-        Blacklist.telegram_user_id == message.from_user.id
-    ).first()
-    usernames = blacklist.usernames.copy()
     try:
-        if callback_data.action == "add":
-            usernames.append(message.text)
-        elif callback_data.action == "rm":
-            usernames = blacklist.usernames.copy()
-            usernames.remove(message.text)
-    except Exception as e:
-        raise ValueError(f"Input error")
-    await blacklist.update(usernames=usernames)
+        blacklist = await Blacklist.prisma().find_unique_or_raise(
+            where={"telegram_user_id": message.from_user.id}
+        )
+    except RecordNotFoundError as e:
+        blacklist = await Blacklist.prisma().create(
+            data=BlacklistCreateInput(
+                telegram_user_id=message.from_user.id, usernames=[]
+            )
+        )
+    new_blacklist = set(blacklist.usernames.copy())
+    if callback_data.action == "add":
+        new_blacklist.add(message.text)
+    elif callback_data.action == "rm":
+        new_blacklist.discard(message.text)
+    await Blacklist.prisma().update(
+        where={"telegram_user_id": message.from_user.id},
+        data={"usernames": {"set": list(new_blacklist)}},
+    )
     await blacklist_menu(message.from_user, state)

@@ -13,7 +13,7 @@ from telegram_bot.keyboards.navigation import (
 from telegram_bot.keyboards.scheduler import (
     scheduler_menu_keyboard_builder,
 )
-from telegram_bot.loader import bot, scheduler
+from loader import bot, scheduler
 from settings import settings
 from template_engine import render_template
 
@@ -42,5 +42,5 @@ async def scheduler_menu(query: CallbackQuery, state: FSMContext):
         with suppress(TelegramBadRequest):
             await query.message.delete()
     else:
-        await query.answer("Not found jobs")
+        await query.answer("Jobs not found")
         await start_callback(query, state)

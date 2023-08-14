@@ -1,15 +1,15 @@
 from aiogram import Dispatcher
 from aredis_om import Migrator
 
+import loader
 from _logging import configure_logging
+from loader import bot
 from scheduler.lifetime import (
     init_scheduler,
     shutdown_scheduler,
 )
 from settings import settings
-from telegram_bot import loader
 from telegram_bot.handlers import menu, kwork, scheduler
-from telegram_bot.loader import bot
 
 
 async def startup_bot(dp: Dispatcher) -> None:
@@ -24,8 +24,11 @@ async def startup_bot(dp: Dispatcher) -> None:
         scheduler.router,
     )
     await Migrator().run()
+    await loader.prisma.connect()
 
 
 async def shutdown_bot(dp: Dispatcher) -> None:
+    if loader.prisma.is_connected():
+        await loader.prisma.disconnect()
     await dp.storage.close()
     shutdown_scheduler(loader.scheduler)

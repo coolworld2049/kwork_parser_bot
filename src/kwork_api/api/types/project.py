@@ -7,7 +7,7 @@ from ..types.achievement import Achievement
 
 class Project(BaseModel):
     id: int = None
-    user_id: int = None
+    telegram_user_id: int = None
     username: str = None
     profile_picture: str = None
     price: int = None

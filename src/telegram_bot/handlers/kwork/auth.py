@@ -5,9 +5,15 @@ from aiogram import F, Router, types
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message, User, ReplyKeyboardRemove
+from prisma.models import KworkAccount
+from prisma.types import (
+    KworkAccountCreateInput,
+    KworkAccountUpdateInput,
+    KworkAccountUpsertInput,
+)
 
-from kwork_api.kwork import KworkApi, get_kwork_api
-from kwork_api.models import KworkAccount
+from kwork_api.kwork import get_kwork_api
+from loader import bot
 from telegram_bot.callbacks import (
     MenuCallback,
 )
@@ -15,8 +21,8 @@ from telegram_bot.handlers.decorators import message_process_error
 from telegram_bot.handlers.kwork.menu import kwork_menu
 from telegram_bot.handlers.menu import start_message, start_callback
 from telegram_bot.keyboards.kwork import auth_keyboard_builder
-from telegram_bot.loader import bot
 from telegram_bot.states import AuthState
+from telegram_bot.utils import get_password_hash
 
 router = Router(name=__file__)
 
@@ -25,7 +31,7 @@ async def auth_menu(user: User, state: FSMContext):
     await state.clear()
     message = await bot.send_message(
         user.id,
-        "Enter your kwork account login.\n<b>Attention! Data will be updated</b>",
+        "Enter your kwork account login.",
         reply_markup=auth_keyboard_builder(callback_name="client").as_markup(),
     )
     await state.update_data(
@@ -60,12 +66,10 @@ async def auth_cancel_message(message: Message, state: FSMContext):
 @router.callback_query(
     MenuCallback.filter(F.name == "client-login" and F.action == "rm")
 )
-async def auth_cancel_callback(
-    query: CallbackQuery, state: FSMContext, kwork_api: KworkApi
-):
+async def auth_cancel_callback(query: CallbackQuery, state: FSMContext):
     await query.message.delete()
     await auth_cancel(query.from_user, state)
-    await kwork_menu(query, state, kwork_api)
+    await kwork_menu(query, state)
 
 
 @router.message(AuthState.set_login)
@@ -82,8 +86,14 @@ async def auth_password(message: Message, state: FSMContext):
 @router.message(AuthState.set_password)
 @message_process_error
 async def auth_phone(message: Message, state: FSMContext):
+    state_data = await state.get_data()
+    async with get_kwork_api(
+        login=state_data.get("login"),
+        password=message.text,
+    ) as api:
+        token = await api.get_token()
     await state.update_data(
-        password=message.text, current_message_id=message.message_id
+        password=message.text, current_message_id=message.message_id, token=token
     )
     keyboard = types.ReplyKeyboardMarkup(
         keyboard=[
@@ -116,16 +126,21 @@ async def auth_finish(message: Message, state: FSMContext):
             phone = message.text
         else:
             raise ValueError("Phone Number Invalid")
-    kwork_account = KworkAccount(
-        telegram_user_id=message.from_user.id,
+    kwork_account_update = KworkAccountUpdateInput(
         login=state_data.get("login"),
-        password=state_data.get("password"),
+        password=get_password_hash(state_data.get("password")),
         phone=phone,
+        token=state_data.get("token")
     )
-    async with get_kwork_api(kwork_account) as api:
-        await api.get_token()
-    await kwork_account.save()
-    await kwork_account.expire(86400 * 7)
+    kwork_account_create = KworkAccountCreateInput(
+        telegram_user_id=message.from_user.id, **kwork_account_update
+    )
+    kwork_account = await KworkAccount.prisma().upsert(
+        data=KworkAccountUpsertInput(
+            create=kwork_account_create, update=kwork_account_update
+        ),
+        where={"telegram_user_id": message.from_user.id},
+    )
     with suppress(TelegramBadRequest):
         for m_id in range(state_data.get("first_message_id"), message.message_id + 1):
             await bot.delete_message(message.from_user.id, m_id)
@@ -135,8 +150,6 @@ async def auth_finish(message: Message, state: FSMContext):
 
 
 @router.callback_query(MenuCallback.filter(F.name == "client-logout"))
-async def logout(query: CallbackQuery, state: FSMContext, kwork_api: KworkApi):
-    if kwork_api:
-        kwork_account = kwork_api.kwork_account
-        await kwork_account.expire(0)
+async def logout(query: CallbackQuery, state: FSMContext):
+    await KworkAccount.prisma().delete(where={"telegram_user_id": query.from_user.id})
     await start_callback(query, state)

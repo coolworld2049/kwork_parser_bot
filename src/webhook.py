@@ -5,8 +5,8 @@ from loguru import logger
 
 from settings import settings
 from telegram_bot.dispatcher import dp
-from telegram_bot.lifecycle import startup_bot, shutdown_bot
-from telegram_bot.loader import bot
+from lifecycle import startup_bot, shutdown_bot
+from loader import bot
 
 app = FastAPI()
 router = APIRouter()

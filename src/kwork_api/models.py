@@ -4,7 +4,7 @@ from datetime import datetime
 import pytz
 from aredis_om import Field, JsonModel
 
-from telegram_bot.loader import redis
+from loader import redis
 from kwork_api.api.types import Project, Actor
 from settings import settings
 
@@ -15,25 +15,12 @@ class BaseModel(JsonModel, ABC):
         database = redis
 
 
-class Blacklist(BaseModel):
-    telegram_user_id: int = Field(index=True, primary_key=True)
-    usernames: list[str] | None = Field([], index=True)
-
-
 class KworkActor(BaseModel, Actor):
     id: int = Field(index=True, primary_key=True)
     username: str = Field(index=True, full_text_search=True)
 
     class Meta:
         embedded = True
-
-
-class KworkAccount(BaseModel):
-    telegram_user_id: int = Field(index=True, primary_key=True)
-    login: str | None = Field(index=True)
-    password: str | None = Field(index=True)
-    phone: str | None = Field(index=True)
-    actor: KworkActor | None
 
 
 class KworkProject(Project):

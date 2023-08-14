@@ -14,7 +14,7 @@ from telegram_bot.handlers.menu import start_message
 from telegram_bot.keyboards.navigation import (
     menu_navigation_keyboard_builder,
 )
-from telegram_bot.loader import bot, scheduler
+from loader import bot, scheduler
 from telegram_bot.states import SchedulerState
 from scheduler.models import SchedulerJob
 from settings import settings

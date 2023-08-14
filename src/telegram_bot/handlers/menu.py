@@ -5,7 +5,11 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import User, Message, CallbackQuery
+from prisma.models import BotUser
+from prisma.types import BotUserCreateInput, BotUserUpsertInput, BotUserUpdateInput
 
+from loader import bot
+from settings import settings
 from telegram_bot.callbacks import MenuCallback
 from telegram_bot.keyboards.menu import (
     menu_keyboard_builder,
@@ -13,9 +17,7 @@ from telegram_bot.keyboards.menu import (
 from telegram_bot.keyboards.navigation import (
     menu_navigation_keyboard_builder,
 )
-from telegram_bot.loader import bot
 from template_engine import render_template
-from settings import settings
 
 router = Router(name=__file__)
 
@@ -23,6 +25,15 @@ router = Router(name=__file__)
 async def start_cmd(user: User, state: FSMContext, message_id: int):
     with suppress(TelegramBadRequest):
         await bot.delete_message(user.id, message_id - 1)
+    bot_user_update = BotUserUpdateInput(
+        username=user.username,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        language_code=user.language_code,
+    )
+    bot_user_create = BotUserCreateInput(id=user.id, **bot_user_update)
+    bot_user_upsert = BotUserUpsertInput(create=bot_user_create, update=bot_user_update)
+    bot_user = await BotUser.prisma().upsert(where={"id": user.id}, data=bot_user_upsert)
     await state.clear()
     await bot.send_message(
         user.id,
@@ -50,19 +61,17 @@ async def start_callback(
     await start_cmd(query.from_user, state, query.message.message_id)
 
 
-@router.callback_query(MenuCallback.filter(F.name == "help"))
-async def help_callback(query: CallbackQuery, state: FSMContext):
-    with suppress(TelegramBadRequest):
-        await query.message.delete()
+@router.message(Command("help"))
+async def help_message(message: Message, state: FSMContext):
     commands = {x.command: x.description for x in settings().BOT_COMMANDS}
     builder = menu_navigation_keyboard_builder(
         menu_callback=MenuCallback(name="start").pack()
     )
     await bot.send_message(
-        query.from_user.id,
+        message.from_user.id,
         render_template(
             "help.html",
-            user=query.from_user,
+            user=message.from_user,
             settings=settings(),
         ),
         reply_markup=builder.as_markup(),

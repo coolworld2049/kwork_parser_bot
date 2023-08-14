@@ -19,12 +19,6 @@ def menu_keyboard_builder():
                 name="scheduler",
             ).pack(),
         ),
-        InlineKeyboardButton(
-            text="📄 Help",
-            callback_data=MenuCallback(
-                name="help",
-            ).pack(),
-        ),
     )
     builder.adjust(2, 2)
     return builder

@@ -1,0 +1,38 @@
+generator client {
+  provider             = "prisma-client-py"
+  interface            = asyncio
+  recursive_type_depth = 4
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRESQL_URL")
+}
+
+model BotUser {
+  id            BigInt   @unique
+  first_name    String?
+  last_name     String?
+  username      String?  @unique
+  language_code String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  kworkAccounts KworkAccount[]
+  blacklists    Blacklist[]
+}
+
+model KworkAccount {
+  telegram_user_id BigInt  @unique
+  login            String?
+  password         String?
+  token            String?
+  phone            String?
+  botUser          BotUser @relation(fields: [telegram_user_id], references: [id])
+}
+
+model Blacklist {
+  telegram_user_id BigInt   @unique
+  usernames        String[]
+  botUser          BotUser  @relation(fields: [telegram_user_id], references: [id])
+}

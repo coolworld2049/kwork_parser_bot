@@ -55,6 +55,10 @@ class Kwork:
             self._token = await self.get_token()
         return self._token
 
+    @token.setter
+    async def token(self, value):
+        self._token = value
+
     async def api_request(
         self, method: str, api_method: str, **params
     ) -> typing.Union[dict, typing.NoReturn]:
@@ -96,13 +100,16 @@ class Kwork:
         )
         return Actor(**actor["response"])
 
-    async def get_user(self, user_id: int) -> User:
+    async def get_user(self, telegram_user_id: int) -> User:
         """
-        :param user_id: you can find it in dialogs
+        :param telegram_user_id: you can find it in dialogs
         :return:
         """
         user = await self.api_request(
-            method="post", api_method="user", id=user_id, token=await self.token
+            method="post",
+            api_method="user",
+            id=telegram_user_id,
+            token=await self.token,
         )
         print(user)
         return User(**user["response"])
@@ -233,11 +240,11 @@ class Kwork:
         )
         return channel["response"]["channel"]
 
-    async def send_message(self, user_id: int, text: str) -> dict:  # noqa
-        logging.debug(f"Sending message for {user_id} with text - {text}")
+    async def send_message(self, telegram_user_id: int, text: str) -> dict:  # noqa
+        logging.debug(f"Sending message for {telegram_user_id} with text - {text}")
         resp = await self.session.post(
             f"{self.host.format('inboxCreate')}"
-            f"?user_id={user_id}"
+            f"?telegram_user_id={telegram_user_id}"
             f"&text={urllib.parse.quote(text)}&token={await self.token}",
             headers={"Authorization": "Basic bW9iaWxlX2FwaTpxRnZmUmw3dw=="},
         )

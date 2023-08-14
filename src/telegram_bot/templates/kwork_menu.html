@@ -1,6 +1,9 @@
 👨‍💻 <b>Kwork account</b>
-
+{% if p is not none %}
 Username — {{ actor.username }}
 Status — {{ actor.status }}
 Worker status — {{ actor.worker_status }}
 Unread dialog count — {{ actor.unread_dialog_count }}
+{% else %}
+    NONE
+{% endif %}

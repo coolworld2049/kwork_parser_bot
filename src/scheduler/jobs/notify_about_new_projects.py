@@ -1,23 +1,19 @@
 import asyncio
 
-from aredis_om import NotFoundError
 from loguru import logger
-from redis.exceptions import ResponseError
+from prisma.models import Blacklist, KworkAccount
 
 from kwork_api.api.types import Project
 from kwork_api.kwork import get_kwork_api
 from kwork_api.models import (
     KworkProject,
-    KworkAccount,
-    Blacklist,
 )
-from telegram_bot.loader import bot, scheduler, redis_pool
+from loader import bot, scheduler, redis_pool
 from template_engine import render_template
 
 
 async def notify_about_new_projects(
-    kwork_account: dict,
-    user_id: int,
+    telegram_user_id: int,
     chat_id: int | None,
     subcategories_ids: int | list[int],
     job_id: str = None,
@@ -25,19 +21,18 @@ async def notify_about_new_projects(
     ex: int = 43200,
 ):
     if not chat_id:
-        chat_id = user_id
+        chat_id = telegram_user_id
     rendered = None
     job = scheduler.get_job(job_id) if job_id else None
     projects = []
     old_projects = []
-    try:
-        blacklist: Blacklist = await Blacklist.find(
-            Blacklist.telegram_user_id == user_id
-        ).first()
-    except* (NotFoundError, ResponseError) as e:
-        blacklist = Blacklist(telegram_user_id=user_id)
-
-    async with get_kwork_api(KworkAccount(**kwork_account)) as api:
+    blacklist = await Blacklist.prisma().find_unique(
+        where={"telegram_user_id": telegram_user_id}
+    )
+    kwork_account = await KworkAccount.prisma().find_unique(
+        where={"telegram_user_id": telegram_user_id}
+    )
+    async with get_kwork_api(**kwork_account.dict()) as api:
         cached_projects = await api.cached_projects(
             redis_pool, subcategories_ids, ex=ex
         )
@@ -47,7 +42,7 @@ async def notify_about_new_projects(
 
         def log_msg(*args):
             return (
-                f"user_id:{user_id}"
+                f"telegram_user_id:{telegram_user_id}"
                 f" job_id:{job.id if job else None}"
                 f" job_name:{job.name if job else None}"
                 f" categories_ids:{subcategories_ids}"
@@ -95,7 +90,7 @@ async def notify_about_new_projects(
     if send_message:
         if len(rendered) >= 4096:
             for i, r in enumerate(rendered.split("\n\n")):
-                await asyncio.sleep(.1)
+                await asyncio.sleep(0.1)
                 try:
                     await bot.send_message(
                         chat_id,

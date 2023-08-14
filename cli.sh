@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source .env
+source ./src/.env
 
 startup() {
   docker-compose  up -d ngrok

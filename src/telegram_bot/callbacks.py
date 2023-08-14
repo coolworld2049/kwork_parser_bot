@@ -21,7 +21,7 @@ class ConfirmCallback(CallbackData, prefix="confirm"):
 class SchedulerCallback(CallbackData, prefix="scheduler"):
     name: str | None
     action: str | None
-    user_id: int | None
+    telegram_user_id: int | None
     category_id: int | None
     subcategory_id: int | None
     from_: str | None

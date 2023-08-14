@@ -14,7 +14,7 @@ class Dialog(BaseModel):
     unread_count: int = None
     last_message: str = None  # last_message text
     time: int = None
-    user_id: int = None
+    telegram_user_id: int = None
     username: str = None
     profilepicture: str = None
     link: str = None

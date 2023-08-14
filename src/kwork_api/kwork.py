@@ -1,4 +1,5 @@
 import json
+import typing
 from contextlib import asynccontextmanager
 from datetime import timedelta
 from typing import Any, AsyncGenerator
@@ -10,18 +11,26 @@ from redis.asyncio.client import Redis
 from kwork_api.api.kwork import Kwork
 from kwork_api.api.types import Category, Project
 from kwork_api.api.types.category import Subcategory
-from kwork_api.models import KworkAccount
 
 
 class KworkApi(Kwork):
-    def __init__(self, kwork_account: KworkAccount, **kwargs):
+    def __init__(
+        self,
+        login: str,
+        password: str,
+        proxy: typing.Optional[str] = None,
+        phone: typing.Optional[str] = None,
+        token: typing.Optional[str] = None,
+        *args,
+        **kwargs,
+    ):
         super().__init__(
-            login=kwork_account.login,
-            password=kwork_account.password,
-            phone=kwork_account.phone,
-            **kwargs,
+            login=login,
+            password=password,
+            proxy=proxy,
+            phone=phone,
         )
-        self.kwork_account = kwork_account
+        self._token = token
         self.redis_prefix = KworkApi.__class__.__name__
 
     def _r_key(self, value: Any):
@@ -87,9 +96,10 @@ class KworkApi(Kwork):
 
 @asynccontextmanager
 async def get_kwork_api(
-    kwork_account: KworkAccount,
+    *args,
+    **kwargs,
 ) -> AsyncGenerator[KworkApi, None]:
-    kwork_api = KworkApi(kwork_account)
+    kwork_api = KworkApi(*args, **kwargs)
     try:
         yield kwork_api
     except Exception as e:

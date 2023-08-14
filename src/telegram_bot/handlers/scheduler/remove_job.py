@@ -5,7 +5,7 @@ from aiogram.types import CallbackQuery, Message
 from telegram_bot.callbacks import SchedulerCallback, ConfirmCallback
 from telegram_bot.handlers.scheduler.menu import scheduler_menu
 from telegram_bot.keyboards.confirm import confirm_keyboard_builder
-from telegram_bot.loader import bot, scheduler
+from loader import bot, scheduler
 from telegram_bot.states import SchedulerState
 
 router = Router(name=__file__)

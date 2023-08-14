@@ -29,7 +29,7 @@ class Message:
         api,
         from_id: int,
         text: str,
-        to_user_id: int,
+        to_telegram_user_id: int,
         inbox_id: int,
         title: str,
         last_message: dict,
@@ -37,7 +37,7 @@ class Message:
         self.api = api
         self.from_id = from_id
         self.text = text
-        self.to_user_id = to_user_id
+        self.to_telegram_user_id = to_telegram_user_id
         self.inbox_id = inbox_id
         self.title = title
         self.last_message = last_message

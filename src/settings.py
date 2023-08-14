@@ -19,7 +19,8 @@ class BotSettings(BaseSettings):
     BOT_ACL_USER_IDS: Optional[list[int]] = None
     BOT_ACL_ENABLED: Literal["True", "true", "False", "false"] = "false"
     BOT_COMMANDS: list[BotCommand] = [
-        BotCommand(command="/start", description="start the telegram_bot"),
+        BotCommand(command="/start", description="start bot"),
+        BotCommand(command="/help", description="get help"),
     ]
     NOTIFICATION_CHANNEL_ID: Optional[int] = None
     WEBHOOK_URL: Optional[str] = None

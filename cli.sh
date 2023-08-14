@@ -3,7 +3,7 @@
 source ./src/.env
 
 startup() {
-  docker-compose  up -d ngrok
+  AUTH_TOKEN=${NGROK_AUTH_TOKEN} docker-compose  up -d ngrok
   echo "Please enter ngrok https endpoint url ( https://dashboard.ngrok.com/cloud-edge/endpoints ):"
   read webhook_endpoint
   WEBHOOK_URL=${webhook_endpoint} docker-compose  up -d telegram-bot

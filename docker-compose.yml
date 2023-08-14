@@ -58,7 +58,6 @@ services:
     env_file:
       - ./src/.env
     environment:
-      - AUTH_TOKEN=${NGROK_AUTH_TOKEN}
       - REGION=eu
       - DOMAIN=telegram-bot
       - PORT=8000

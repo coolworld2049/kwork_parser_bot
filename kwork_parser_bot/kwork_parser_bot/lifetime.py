@@ -1,5 +1,4 @@
 from aiogram import Dispatcher
-from aredis_om import Migrator
 
 import loader
 from _logging import configure_logging
@@ -18,8 +17,6 @@ async def startup_bot(dp: Dispatcher) -> None:
     await bot.set_my_commands(get_settings().BOT_COMMANDS)
     init_scheduler(loader.scheduler)
     dp.include_routers(menu.router, kwork.router, scheduler.router, settings.router)
-
-    await Migrator().run()
     await loader.prisma.connect()
 
 

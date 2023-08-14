@@ -1,6 +1,8 @@
 import random
+from contextlib import suppress
 
 from aiogram import F, Router
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from apscheduler.triggers.cron import CronTrigger
@@ -59,4 +61,5 @@ async def scheduler_add_job_process(message: Message, state: FSMContext):
     sched_job_data.update({"id": sched_job.id})
     scheduler.add_job(**sched_job_data)
     await state.clear()
+    await message.delete()
     await start_message(message, state)

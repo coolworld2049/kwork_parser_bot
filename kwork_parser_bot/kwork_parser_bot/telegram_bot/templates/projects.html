@@ -10,5 +10,5 @@ Price — {{project.price}} to {{project.possible_price_limit}}
 Offers — {{project.offers}}
 Time left — {{project.time_left_time}}
 Date confirm — {{project.date_confirm_datetime}}
-Customer — <a href="https://kwork.ru/user/{{ project.username }}">{{project.username}}</a>
+Customer — <code>{{ project.username }}</code> <a href="https://kwork.ru/user/{{ project.username }}">{{project.username}}</a>
 {% endfor %}

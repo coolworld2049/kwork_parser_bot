@@ -4,7 +4,13 @@ COPY requirements.txt /tmp/
 
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
-COPY src /app
+COPY kwork_parser_bot /app
+
+COPY prisma /app
+
+COPY prestart.sh /app/prestart.sh
+
+COPY start.sh /app/start.sh
 
 ENV PYTHONPATH=/app
 

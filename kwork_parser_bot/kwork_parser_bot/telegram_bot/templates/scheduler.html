@@ -5,4 +5,5 @@ Name — {{ job.name }}
 Func — {{ job.func.__name__ }}
 Trigger — {{ job.trigger }}
 Next run time — <b>{{ job.next_run_time }}</b>
+Timezone — <b>{{ job.next_run_time.tzinfo }}</b>
 {% endfor %}

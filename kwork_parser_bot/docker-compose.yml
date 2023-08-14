@@ -7,11 +7,11 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - ./src/.env
+      - ./.env
     environment:
       - WEBHOOK_URL
       - BOT_RUN_MODE=webhook
-      - POSTGRESQL_MASTER_HOST=pgbouncer
+      - POSTGRESQL_URL=postgresql://${POSTGRESQL_USERNAME}:${POSTGRESQL_PASSWORD}@pgbouncer:6432/${POSTGRESQL_DATABASE}
       - REDIS_MASTER_HOST=redis
     depends_on:
       - pgbouncer
@@ -23,7 +23,7 @@ services:
     ports:
       - "6432:6432"
     env_file:
-      - ./src/.env
+      - ./.env
     environment:
       - POSTGRESQL_HOST=postgres
     volumes:
@@ -37,7 +37,7 @@ services:
     ports:
       - '5432:5432'
     env_file:
-      - ./src/.env
+      - ./.env
     volumes:
       - ./deployment/postgresql/conf/override.conf:/opt/bitnami/postgresql/conf/conf.d/override.conf
       - postgres-data:/bitnami/postgresql
@@ -56,7 +56,7 @@ services:
     ports:
       - "4040:4040"
     env_file:
-      - ./src/.env
+      - ./.env
     environment:
       - REGION=eu
       - DOMAIN=telegram-bot

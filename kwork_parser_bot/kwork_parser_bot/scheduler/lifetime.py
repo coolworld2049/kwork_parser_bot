@@ -6,7 +6,7 @@ from settings import get_settings
 
 def init_scheduler(scheduler: Scheduler) -> None:
     scheduler.add_jobstore(
-        SQLAlchemyJobStore(url=get_settings().postgres_url, tablename="SchedulerJobs")
+        SQLAlchemyJobStore(url=get_settings().POSTGRESQL_URL, tablename="SchedulerJobs")
     )
     scheduler.start()
 

@@ -9,9 +9,7 @@ from settings import get_settings
 class KworkProject(Project):
     @classmethod
     def convert_to_datetime(cls, timestamp: float):
-        return datetime.fromtimestamp(
-            timestamp, tz=pytz.timezone(get_settings().TIMEZONE)
-        )
+        return datetime.fromtimestamp(timestamp, tz=pytz.timezone(get_settings().TZ))
 
     @property
     def time_left_datetime(self):

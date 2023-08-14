@@ -10,6 +10,6 @@ from settings import get_settings
 os.environ["REDIS_OM_URL"] = get_settings().redis_url
 redis = Redis.from_url(get_settings().redis_url)
 redis_pool = ConnectionPool.from_url(get_settings().redis_url)
-scheduler = Scheduler(timezone=get_settings().TIMEZONE)
+scheduler = Scheduler(timezone=get_settings().TZ)
 bot = Bot(get_settings().BOT_TOKEN, parse_mode="HTML")
 prisma = Prisma(auto_register=True)

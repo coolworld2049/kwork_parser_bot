@@ -1,0 +1,21 @@
+version: '3.9'
+
+services:
+  pgbouncer:
+    extends:
+      service: pgbouncer
+      file: docker-compose.yml
+  postgres:
+    extends:
+      service: postgres
+      file: docker-compose.yml
+  redis:
+    extends:
+      service: redis
+      file: docker-compose.yml
+    image: redis/redis-stack:latest
+    ports:
+      - "8001:8001"
+
+volumes:
+  postgres-data:

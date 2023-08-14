@@ -34,7 +34,7 @@ async def start_cmd(user: User, state: FSMContext, message_id: int):
     )
     bot_user_create = BotUserCreateInput(
         id=user.id,
-        settings=Json(data={"timezone": get_settings().TIMEZONE}),
+        settings=Json(data={"timezone": get_settings().TZ}),
         **bot_user_update
     )
     bot_user_upsert = BotUserUpsertInput(create=bot_user_create, update=bot_user_update)

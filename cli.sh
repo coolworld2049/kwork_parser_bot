@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-source ./src/.env
+cd kwork_parser_bot
+
+source ./.env
 
 startup() {
   AUTH_TOKEN=${NGROK_AUTH_TOKEN} docker-compose  up -d ngrok
@@ -10,6 +12,9 @@ startup() {
 
 }
 
+dev() {
+  docker-compose -f docker-compose.dev.yml up -d
+}
 shutdown() {
   docker-compose down --rmi local --remove-orphans
 }
@@ -19,6 +24,7 @@ print_usage() {
   echo "Options:"
   echo "  startup           Bring up containers using Docker Compose"
   echo "  shutdown          Remove containers, images"
+  echo "  dev               development mode"
   echo "  --help            Display this help message"
 }
 
@@ -35,6 +41,9 @@ startup)
 shutdown)
   shutdown
   ;;
+dev)
+  dev
+  ;;
 --help)
   print_usage
   ;;
@@ -44,3 +53,5 @@ shutdown)
   exit 1
   ;;
 esac
+
+cd ..

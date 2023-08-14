@@ -61,4 +61,5 @@ async def settings_edit_message(message: Message, state: FSMContext):
     with suppress(TelegramBadRequest):
         await bot.delete_message(message.from_user.id, message.message_id - 1)
         await message.delete()
+    await state.clear()
     await settings_menu(message.from_user)

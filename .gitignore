@@ -106,7 +106,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-src/kwork_parser_bot/.env
+kwork_parser_bot/kwork_parser_bot/.env
 .venv
 env/
 venv/
@@ -138,7 +138,7 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-/src/kwork_parser_bot/kwork_parser_bot/kwork_parser_bot/.logs/
+/kwork_parser_bot/kwork_parser_bot/kwork_parser_bot/kwork_parser_bot/.logs/
 !/deployment/.volumes/
 !/.env
 !/.logs/

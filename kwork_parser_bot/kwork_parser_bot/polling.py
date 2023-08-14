@@ -13,7 +13,7 @@ async def main():
         await startup_bot(dp)
         await dp.start_polling(bot)
     except Exception as e:
-        logger.error(e)
+        logger.exception(e)
     finally:
         await shutdown_bot(dp)
 

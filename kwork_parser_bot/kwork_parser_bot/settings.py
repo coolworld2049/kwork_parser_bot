@@ -4,7 +4,7 @@ from typing import Optional, Literal
 
 from aiogram.types import BotCommand
 from dotenv import load_dotenv
-from pydantic import BaseSettings, PostgresDsn
+from pydantic import BaseSettings
 
 load_dotenv()
 
@@ -57,34 +57,11 @@ class RedisSettings(BaseSettings):
     REDIS_OM_URL: Optional[str]
 
 
-class DatabaseSettings(BaseSettings):
-    POSTGRESQL_MASTER_HOST: str = "localhost"
-    POSTGRESQL_MASTER_PORT: Optional[int] = 5432
-    POSTGRESQL_DATABASE: Optional[str] = "app"
-    POSTGRESQL_USERNAME: str
-    POSTGRESQL_PASSWORD: str
-
-    @property
-    def postgres_url(self) -> str:
-        dsn = PostgresDsn.build(
-            scheme="postgresql",
-            user=self.POSTGRESQL_USERNAME,
-            password=self.POSTGRESQL_PASSWORD,
-            host=self.POSTGRESQL_MASTER_HOST,
-            port=str(self.POSTGRESQL_MASTER_PORT),
-            path=f"/{self.POSTGRESQL_DATABASE}",
-        )
-        return dsn
-
-    @property
-    def postgres_asyncpg_url(self) -> str:
-        return self.postgres_url.replace("://", "+asyncpg://")
-
-
-class Settings(BotSettings, SchedulerSettings, RedisSettings, DatabaseSettings):
+class Settings(BotSettings, SchedulerSettings, RedisSettings):
     LOG_FILE_PATH: Optional[str] = f"{pathlib.Path(__file__).parent.parent}/.logs"
     LOGGING_LEVEL: Optional[str] = "INFO"
-    TIMEZONE: Optional[str] = "Europe/Moscow"
+    TZ: Optional[str] = "Europe/Moscow"
+    POSTGRESQL_URL: str
 
 
 @lru_cache

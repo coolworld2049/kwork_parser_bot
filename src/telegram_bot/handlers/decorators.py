@@ -1,10 +1,11 @@
 import asyncio
+import html
 from contextlib import suppress
 from functools import wraps
 
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import Message, UNSET
 from loguru import logger
 
 
@@ -14,7 +15,7 @@ def message_process_error(func):
         state: FSMContext = kwargs.get("state")
         bot = state.bot
         message_answer = await message.answer(
-            f"<code>{str(e) if e else 'Error'}</code>"
+            f"{html.escape(str(e), quote=True) if e else 'Error'}",
         )
         await asyncio.sleep(1.5)
         with suppress(TelegramBadRequest):

@@ -1,11 +1,13 @@
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 
 from scheduler.scheduler import Scheduler
-from settings import settings
+from settings import get_settings
 
 
 def init_scheduler(scheduler: Scheduler) -> None:
-    scheduler.add_jobstore(SQLAlchemyJobStore(url=settings().postgres_url))
+    scheduler.add_jobstore(
+        SQLAlchemyJobStore(url=get_settings().postgres_url, tablename="SchedulerJobs")
+    )
     scheduler.start()
 
 

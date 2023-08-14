@@ -3,7 +3,7 @@ import asyncio
 from loguru import logger
 
 from telegram_bot.dispatcher import dp
-from lifecycle import startup_bot, shutdown_bot
+from lifetime import startup_bot, shutdown_bot
 from loader import bot
 
 

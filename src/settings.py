@@ -88,6 +88,6 @@ class Settings(BotSettings, SchedulerSettings, RedisSettings, DatabaseSettings):
 
 
 @lru_cache
-def settings() -> Settings:
+def get_settings() -> Settings:
     config = Settings
     return config()

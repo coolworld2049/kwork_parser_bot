@@ -10,25 +10,33 @@ datasource db {
 }
 
 model BotUser {
-  id            BigInt   @unique
+  id            BigInt         @unique
   first_name    String?
   last_name     String?
-  username      String?  @unique
+  username      String?        @unique
   language_code String?
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
+  settings      Json
   kworkAccounts KworkAccount[]
   blacklists    Blacklist[]
 }
 
+model SchedulerJobs {
+  id            String @unique @db.Char(191)
+  next_run_time Float?
+  job_state     Bytes
+}
+
 model KworkAccount {
-  telegram_user_id BigInt  @unique
+  telegram_user_id BigInt   @unique
   login            String?
   password         String?
   token            String?
   phone            String?
-  botUser          BotUser @relation(fields: [telegram_user_id], references: [id])
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+  botUser          BotUser  @relation(fields: [telegram_user_id], references: [id])
 }
 
 model Blacklist {

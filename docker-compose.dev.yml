@@ -1,0 +1,10 @@
+version: '3.9'
+
+services:
+  redis:
+    extends:
+      service: redis
+      file: docker-compose.yml
+    image: redis/redis-stack:latest
+    ports:
+      - "8001:8001"

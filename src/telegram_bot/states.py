@@ -22,3 +22,7 @@ class SchedulerState(StatesGroup):
 
 class BlacklistState(StatesGroup):
     manage = State()
+
+
+class SettingsState(StatesGroup):
+    edit = State()

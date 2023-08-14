@@ -4,7 +4,7 @@ from typing import Any, Union
 
 from loguru import logger
 
-from settings import settings
+from settings import get_settings
 
 
 class InterceptHandler(logging.Handler):
@@ -69,9 +69,9 @@ def configure_logging() -> None:  # pragma: no cover
     logging.basicConfig(handlers=[intercept_handler], level=logging.NOTSET)
     logger.remove()
     logger.add(
-        settings().LOG_FILE_PATH + "/access.log",
+        get_settings().LOG_FILE_PATH + "/access.log",
         serialize=False,
-        level=settings().LOGGING_LEVEL,
+        level=get_settings().LOGGING_LEVEL,
         enqueue=True,
         backtrace=True,
         diagnose=True,
@@ -82,6 +82,6 @@ def configure_logging() -> None:  # pragma: no cover
     )
     logger.add(
         sys.stdout,
-        level=settings().LOGGING_LEVEL,
+        level=get_settings().LOGGING_LEVEL,
         format=record_formatter,
     )

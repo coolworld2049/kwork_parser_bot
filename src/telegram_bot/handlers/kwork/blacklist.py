@@ -38,14 +38,14 @@ async def blacklist_menu(user: User, state: FSMContext):
         back_callback=MenuCallback(name="client").pack(),
         inline_buttons=builder.buttons,
     )
-    blacklist = (
-        await Blacklist.prisma().find_unique(where={"telegram_user_id": user.id}) or []
+    blacklist = await Blacklist.prisma().find_unique(
+        where={"telegram_user_id": user.id}
     )
     message = await bot.send_message(
         user.id,
         render_template(
             "blacklist.html",
-            blacklist=blacklist.usernames,
+            blacklist=blacklist.usernames if blacklist else {},
         ),
         reply_markup=builder.as_markup(),
     )

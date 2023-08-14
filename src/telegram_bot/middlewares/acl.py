@@ -4,7 +4,7 @@ from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, User
 from loguru import logger
 
-from settings import settings
+from settings import get_settings
 
 
 class ACLMiddleware(BaseMiddleware):
@@ -15,10 +15,13 @@ class ACLMiddleware(BaseMiddleware):
         data: Dict[str, Any],
     ) -> Any:
         user: User = data.get("event_from_user")
-        if not settings().BOT_ACL_USER_IDS or not len(settings().BOT_ACL_USER_IDS) > 0:
-            logger.error(f"BOT_ACL_USER_IDS={settings().BOT_ACL_USER_IDS}")
+        if (
+            not get_settings().BOT_ACL_USER_IDS
+            or not len(get_settings().BOT_ACL_USER_IDS) > 0
+        ):
+            logger.error(f"BOT_ACL_USER_IDS={get_settings().BOT_ACL_USER_IDS}")
             return None
-        elif user.id not in settings().BOT_ACL_USER_IDS:
+        elif user.id not in get_settings().BOT_ACL_USER_IDS:
             logger.info(f"Access denied for user - {user.json()}")
             return None
         else:

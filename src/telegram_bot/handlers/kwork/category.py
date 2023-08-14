@@ -4,6 +4,10 @@ from aiogram.types import CallbackQuery
 from loguru import logger
 from prisma.models import KworkAccount
 
+from kwork_api.kwork import get_kwork_api
+from loader import bot, redis_pool
+from scheduler.models import SchedulerJob
+from settings import get_settings
 from telegram_bot.callbacks import (
     MenuCallback,
     KworkCategoryCallback,
@@ -16,11 +20,7 @@ from telegram_bot.keyboards.navigation import (
 from telegram_bot.keyboards.scheduler import (
     scheduler_jobs_keyboard_builder,
 )
-from loader import bot, redis_pool
 from telegram_bot.states import SchedulerState
-from kwork_api.kwork import KworkApi, get_kwork_api
-from scheduler.models import SchedulerJob
-from settings import settings
 
 router = Router(name=__file__)
 
@@ -111,11 +111,11 @@ async def subcategory_sched_job(
         text="🆕 Notify about new projects",
         callback=notify_about_new_projects_callback,
         name=f"{parent_category.name}-{category.name}",
-        func=f"{settings().SCHED_JOBS_MODULE}:notify_about_new_projects",
+        func=f"{get_settings().SCHED_JOBS_MODULE}:notify_about_new_projects",
         args=(
             query.from_user.id,
-            settings().NOTIFICATION_CHANNEL_ID
-            if settings().NOTIFICATION_CHANNEL_ID
+            get_settings().NOTIFICATION_CHANNEL_ID
+            if get_settings().NOTIFICATION_CHANNEL_ID
             else query.from_user.id,
             [subcategory_id],
             notify_about_new_projects_callback.pack(),

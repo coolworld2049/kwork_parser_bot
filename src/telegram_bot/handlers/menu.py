@@ -5,11 +5,12 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import User, Message, CallbackQuery
+from prisma import Json
 from prisma.models import BotUser
 from prisma.types import BotUserCreateInput, BotUserUpsertInput, BotUserUpdateInput
 
 from loader import bot
-from settings import settings
+from settings import get_settings
 from telegram_bot.callbacks import MenuCallback
 from telegram_bot.keyboards.menu import (
     menu_keyboard_builder,
@@ -31,9 +32,15 @@ async def start_cmd(user: User, state: FSMContext, message_id: int):
         last_name=user.last_name,
         language_code=user.language_code,
     )
-    bot_user_create = BotUserCreateInput(id=user.id, **bot_user_update)
+    bot_user_create = BotUserCreateInput(
+        id=user.id,
+        settings=Json(data={"timezone": get_settings().TIMEZONE}),
+        **bot_user_update
+    )
     bot_user_upsert = BotUserUpsertInput(create=bot_user_create, update=bot_user_update)
-    bot_user = await BotUser.prisma().upsert(where={"id": user.id}, data=bot_user_upsert)
+    bot_user = await BotUser.prisma().upsert(
+        where={"id": user.id}, data=bot_user_upsert
+    )
     await state.clear()
     await bot.send_message(
         user.id,
@@ -63,7 +70,7 @@ async def start_callback(
 
 @router.message(Command("help"))
 async def help_message(message: Message, state: FSMContext):
-    commands = {x.command: x.description for x in settings().BOT_COMMANDS}
+    commands = {x.command: x.description for x in get_settings().BOT_COMMANDS}
     builder = menu_navigation_keyboard_builder(
         menu_callback=MenuCallback(name="start").pack()
     )
@@ -72,7 +79,7 @@ async def help_message(message: Message, state: FSMContext):
         render_template(
             "help.html",
             user=message.from_user,
-            settings=settings(),
+            settings=get_settings(),
         ),
         reply_markup=builder.as_markup(),
     )

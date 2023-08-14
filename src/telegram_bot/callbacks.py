@@ -13,6 +13,11 @@ class MenuCallback(CallbackData, prefix="menu"):
     message_id: int | None
 
 
+class SettingsCallback(CallbackData, prefix="settings"):
+    name: str
+    action: str | None
+
+
 class ConfirmCallback(CallbackData, prefix="confirm"):
     name: str
     answer: str

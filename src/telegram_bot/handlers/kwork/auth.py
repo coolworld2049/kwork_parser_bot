@@ -130,7 +130,7 @@ async def auth_finish(message: Message, state: FSMContext):
         login=state_data.get("login"),
         password=get_password_hash(state_data.get("password")),
         phone=phone,
-        token=state_data.get("token")
+        token=state_data.get("token"),
     )
     kwork_account_create = KworkAccountCreateInput(
         telegram_user_id=message.from_user.id, **kwork_account_update

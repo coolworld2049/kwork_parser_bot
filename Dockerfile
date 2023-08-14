@@ -12,6 +12,4 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
 
-RUN prestart.sh
-
-ENTRYPOINT  ["python", "main.py"]
+ENTRYPOINT  ["bash", "./start.sh"]

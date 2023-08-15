@@ -48,6 +48,10 @@ services:
     ports:
       - "6379:6379"
     restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
   ngrok:
     image: shkoliar/ngrok:latest
     hostname: ngrok

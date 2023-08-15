@@ -4,6 +4,7 @@ cd kwork_parser_bot
 
 source ./.env
 
+
 startup() {
   AUTH_TOKEN=${NGROK_AUTH_TOKEN} docker-compose  up -d ngrok
   echo "Please enter ngrok https endpoint url ( https://dashboard.ngrok.com/cloud-edge/endpoints ):"
@@ -13,6 +14,7 @@ startup() {
 }
 
 dev() {
+  . prestart.sh
   docker-compose -f docker-compose.dev.yml up -d
 }
 shutdown() {

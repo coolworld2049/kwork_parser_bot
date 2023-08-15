@@ -47,8 +47,6 @@ services:
     hostname: redis
     ports:
       - "6379:6379"
-    volumes:
-      - ./deployment/redis/redis-stack.conf:/opt/redis-stack/etc/redis-stack.conf
     restart: always
   ngrok:
     image: shkoliar/ngrok:latest

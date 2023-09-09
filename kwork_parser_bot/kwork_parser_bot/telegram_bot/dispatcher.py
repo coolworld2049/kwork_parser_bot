@@ -13,11 +13,7 @@ from telegram_bot.middlewares.acl import ACLMiddleware
 
 dp = Dispatcher(
     events_isolation=RedisEventIsolation(redis),
-    storage=RedisStorage(
-        redis,
-        state_ttl=600,
-        data_ttl=600,
-    ),
+    storage=RedisStorage(redis),
     name=pathlib.Path(__file__).name,
 )
 dp.callback_query.middleware(CallbackAnswerMiddleware())

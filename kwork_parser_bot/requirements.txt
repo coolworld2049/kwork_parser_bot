@@ -16,3 +16,4 @@ pytz~=2023.3
 uvicorn~=0.23.2
 prisma==0.9.1
 passlib
+bcrypt

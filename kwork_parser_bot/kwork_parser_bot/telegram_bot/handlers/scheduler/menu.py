@@ -48,3 +48,5 @@ async def scheduler_menu_message(query: CallbackQuery, state: FSMContext):
     if exist:
         with suppress(TelegramBadRequest):
             await query.message.delete()
+    else:
+        await query.answer("Jobs not found")

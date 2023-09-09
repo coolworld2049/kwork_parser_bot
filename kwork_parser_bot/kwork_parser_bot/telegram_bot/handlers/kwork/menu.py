@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from prisma.models import KworkAccount
 
+from kwork_api.api.exceptions import KworkException
 from kwork_api.kwork import get_kwork_api
 from loader import bot
 from telegram_bot.callbacks import (
@@ -29,9 +30,22 @@ async def kwork_menu(query: CallbackQuery, state: FSMContext):
         where={"telegram_user_id": query.from_user.id}
     )
     actor = None
+    # await KworkAccount.prisma().update_many(
+    #     data={"token": None},
+    #     where={
+    #         "token": {
+    #             "not": {"equals": "null"},
+    #         },
+    #         "telegram_user_id": {"equals": user.id},
+    #     },
+    # )
+
     if kwork_account:
         async with get_kwork_api(**kwork_account.dict()) as api:
-            actor = await api.get_me()
+            try:
+                actor = await api.get_me()
+            except KworkException as e:
+                await query.answer(f"KworkException: {e.args}")
     else:
         await query.answer("Log in to your kwork account", show_alert=True)
     builder = kwork_menu_keyboard_builder()

@@ -1,4 +1,5 @@
 from aiogram import Dispatcher
+from prisma.models import KworkAccount
 
 import loader
 from _logging import configure_logging
@@ -11,13 +12,20 @@ from settings import get_settings
 from telegram_bot.handlers import kwork, scheduler, settings, menu
 
 
+async def clear_data():
+    await KworkAccount.prisma().update_many(
+        data={"token": None}, where={"token": {"not": {"equals": "null"}}}
+    )
+
+
 async def startup_bot(dp: Dispatcher) -> None:
     configure_logging()
     await bot.delete_my_commands()
     await bot.set_my_commands(get_settings().BOT_COMMANDS)
     init_scheduler(loader.scheduler)
-    dp.include_routers(menu.router, kwork.router, scheduler.router, settings.router)
     await loader.prisma.connect()
+    await clear_data()
+    dp.include_routers(menu.router, kwork.router, scheduler.router, settings.router)
 
 
 async def shutdown_bot(dp: Dispatcher) -> None:
